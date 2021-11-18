@@ -45,7 +45,7 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>QRcode pixel ART generator</title>
-        <meta name="description" content="Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in fun way" />
+        <meta name="description" content="Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way" />
         <link rel="icon" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css?family=Press+Start+2P"
