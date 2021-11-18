@@ -3,6 +3,11 @@ const qrcode = require("qrcode-generator");
 const fs = require("fs");
 const { createCanvas, loadImage } = require("canvas");
 
+const cdn_url =
+  "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
+
+const images = ["cat", "dog", "frog", "lol", "troll"];
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(500).json({ error: "Method not allowed" });
@@ -10,18 +15,22 @@ export default async function handler(req, res) {
 
   const { data } = req.body;
 
-  const canvas = createCanvas(320, 320);
+  const imgSize = 512;
+
+  const canvas = createCanvas(512, 512);
   const ctx = canvas.getContext("2d");
 
-  const QR = qrcode(6, "L");
+  const QR = qrcode(6, "M");
   QR.addData(data);
   QR.make();
 
-  const image = await loadImage("public/download.png");
+  const rndImageUrl = `${cdn_url}${images[2]}.png`;
+
+  const image = await loadImage(rndImageUrl);
   ctx.drawImage(image, 0, 0);
 
-  var pixelSize = 1;
-  var blockSize = 3 * pixelSize;
+  let pixelSize = 1;
+  let blockSize = Math.floor((pixelSize * imgSize) / QR.getModuleCount()); // 3 * pixelSize;
 
   var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var d = pixels.data;
@@ -75,5 +84,39 @@ export default async function handler(req, res) {
   }
   ctx.putImageData(pixels, 0, 0);
 
-  res.status(200).json({ url: QR.createDataURL(4, 2) });
+  console.log("module count", QR.getModuleCount());
+
+  console.log(blockSize);
+
+  const cornerSize = 7;
+
+  const isCorner = (row, col, count) => {
+    return (
+      (row < 7 && col < 7) ||
+      (row < 7 && col >= count - 7) ||
+      (col < 7 && row >= count - 7) ||
+      col === 6 ||
+      row === 6
+    );
+  };
+
+  for (let byteRow = 0; byteRow < QR.getModuleCount(); byteRow++) {
+    for (let byteCell = 0; byteCell < QR.getModuleCount(); byteCell++) {
+      // TODO
+      const moduleSize = isCorner(byteRow, byteCell, QR.getModuleCount())
+        ? blockSize
+        : Math.floor(blockSize / 1.7);
+
+      // Middle Cell
+      ctx.fillStyle = QR.isDark(byteRow, byteCell) ? "black" : "white";
+      ctx.fillRect(
+        byteRow * blockSize + pixelSize,
+        byteCell * blockSize + pixelSize,
+        moduleSize,
+        moduleSize
+      );
+    }
+  }
+
+  res.status(200).json({ url: canvas.toDataURL() });
 }

@@ -16,6 +16,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState(null);
 
+  const [img, setImg] = useState(null);
+
   const sendData = useCallback(async () => {
     const data = input.current.value;
 
@@ -32,6 +34,7 @@ export default function Home() {
       setLoading(false);
       input.current.value = "";
       setUrl(json.url);
+      setImg(json.img);
 
       setTimeout(() => {
         if (code) {
@@ -45,7 +48,10 @@ export default function Home() {
     <div className={styles.container}>
       <Head>
         <title>QRcode pixel ART generator</title>
-        <meta name="description" content="Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way" />
+        <meta
+          name="description"
+          content="Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css?family=Press+Start+2P"
@@ -61,7 +67,9 @@ export default function Home() {
         <div className={styles.content}>
           <section className="message-left">
             <i className="nes-bcrikko"></i>
-            <p className="nes-balloon nes-pointer from-left">Generate cool pixel art instead of boring QR code</p>
+            <p className="nes-balloon nes-pointer from-left">
+              Generate cool pixel art instead of boring QR code
+            </p>
           </section>
 
           <section className="nes-container with-title section">
@@ -104,7 +112,6 @@ export default function Home() {
             </h2>
             <p>Text 1</p>
           </section>
-
         </div>
       </main>
     </div>
