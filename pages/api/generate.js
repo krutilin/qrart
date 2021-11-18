@@ -24,7 +24,8 @@ export default async function handler(req, res) {
   QR.addData(data);
   QR.make();
 
-  const rndImageUrl = `${cdn_url}${images[2]}.png`;
+  const rndImageIndex = Math.floor(Math.random() * images.length);
+  const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
 
   const image = await loadImage(rndImageUrl);
   ctx.drawImage(image, 0, 0);
