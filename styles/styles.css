@@ -1,0 +1,17 @@
+.section {
+    margin-top: 2rem;
+}
+
+.message-left {
+    display: flex;
+    flex-direction: row;
+}
+
+.message-left i {
+    align-self: flex-end;
+    margin-right: 32px;
+}
+
+.topic {
+    margin-top: 3rem;
+}

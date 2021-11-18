@@ -1,8 +1,10 @@
 .container {
   padding: 0 2rem;
+  align-items: stretch;
 }
 
 .main {
+  position: relative;
   min-height: 100vh;
   padding: 4rem 0;
   flex: 1;
@@ -10,6 +12,20 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
+  border-bottom: 4px solid #D3D3D3;
+  background-color: white;
+}
+
+.content {
+  max-width: 768px;
 }
 
 .footer {
@@ -55,6 +71,8 @@
   line-height: 1.5;
   font-size: 1.5rem;
 }
+
+
 
 @media (max-width: 600px) {
   .grid {
