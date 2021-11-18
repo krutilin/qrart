@@ -2,6 +2,10 @@
     margin-top: 2rem;
 }
 
+.section input {
+    margin-bottom: 1rem;
+}
+
 .message-left {
     display: flex;
     flex-direction: row;
@@ -14,4 +18,9 @@
 
 .topic {
     margin-top: 3rem;
+}
+
+.code-container {
+    display: flex;
+    justify-content: center;
 }

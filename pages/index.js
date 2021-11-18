@@ -10,12 +10,14 @@ export async function getServerSideProps(context) {
 }
 
 export default function Home() {
-  const ref = useRef();
+  const input = useRef();
+  const code = useRef();
+
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState(null);
 
   const sendData = useCallback(async () => {
-    const data = ref.current.value;
+    const data = input.current.value;
 
     if (data) {
       setLoading(true);
@@ -28,8 +30,9 @@ export default function Home() {
       });
       const json = await res.json();
       setLoading(false);
-      ref.current.value = "";
+      input.current.value = "";
       setUrl(json.url);
+      code.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, []);
 
@@ -82,22 +85,18 @@ export default function Home() {
 
           <section className="nes-container with-title section">
             <h3 className="title">Your data</h3>
-            <textarea
-              ref={ref}
-              id="qr_data"
-              cols="30"
-              rows="2"
-              className="nes-textarea"
-            />
+            <input ref={input} type="text" className="nes-input" />
             <button className="nes-btn is-primary" onClick={sendData}>
               Generate
             </button>
           </section>
 
           {url && (
-            <section className="nes-container with-title section">
+            <section ref={code} className="nes-container with-title section">
               <h3 className="title">Your QR code</h3>
-              <img src={url} alt="QR" />
+              <div className="code-container">
+                <img src={url} alt="QR" />
+              </div>
             </section>
           )}
         </div>
