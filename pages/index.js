@@ -59,6 +59,28 @@ export default function Home() {
         </header>
 
         <div className={styles.content}>
+          <section className="message-left">
+            <i className="nes-bcrikko"></i>
+            <p className="nes-balloon nes-pointer from-left">Generate cool pixel art instead of boring QR code</p>
+          </section>
+
+          <section className="nes-container with-title section">
+            <h3 className="title">Your data</h3>
+            <input ref={input} type="text" className="nes-input" />
+            <button className="nes-btn is-primary" onClick={sendData}>
+              Generate
+            </button>
+          </section>
+
+          {url && (
+            <section ref={code} className="nes-container with-title section">
+              <h3 className="title">Your QR code</h3>
+              <div className="code-container animate__animated animate__bounceInRight">
+                <img src={url} alt="QR" />
+              </div>
+            </section>
+          )}
+
           <section className="topic">
             <h2 id="1">
               <a href="#1">#</a>
@@ -83,27 +105,6 @@ export default function Home() {
             <p>Text 1</p>
           </section>
 
-          <section className="message-left">
-            <i className="nes-bcrikko"></i>
-            <p className="nes-balloon nes-pointer from-left">Generate cool pixel art instead of boring QR code</p>
-          </section>
-
-          <section className="nes-container with-title section">
-            <h3 className="title">Your data</h3>
-            <input ref={input} type="text" className="nes-input" />
-            <button className="nes-btn is-primary" onClick={sendData}>
-              Generate
-            </button>
-          </section>
-
-          {url && (
-            <section ref={code} className="nes-container with-title section">
-              <h3 className="title">Your QR code</h3>
-              <div className="code-container animate__animated animate__bounceInRight">
-                <img src={url} alt="QR" />
-              </div>
-            </section>
-          )}
         </div>
       </main>
     </div>
