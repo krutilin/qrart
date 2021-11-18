@@ -32,7 +32,12 @@ export default function Home() {
       setLoading(false);
       input.current.value = "";
       setUrl(json.url);
-      code.current.scrollIntoView({ behavior: "smooth", block: "end" });
+
+      setTimeout(() => {
+        if (code) {
+          code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
+        }
+      }, 0);
     }
   }, []);
 
@@ -94,7 +99,7 @@ export default function Home() {
           {url && (
             <section ref={code} className="nes-container with-title section">
               <h3 className="title">Your QR code</h3>
-              <div className="code-container">
+              <div className="code-container animate__animated animate__bounceInRight">
                 <img src={url} alt="QR" />
               </div>
             </section>
