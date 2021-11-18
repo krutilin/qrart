@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect, useRef} from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
@@ -7,14 +7,14 @@ import styles from '../styles/Home.module.css'
 export async function getServerSideProps(context) {
 
   return {
-  props: {}
+    props: {}
   }
 }
 
 export default function Home() {
   const ref = useRef()
-  const [ loading, setLoading ] = useState(false)
-  const [ url, setUrl ] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [url, setUrl] = useState(null)
 
   const sendData = useCallback(async () => {
     const data = ref.current.value
@@ -49,15 +49,15 @@ export default function Home() {
           Welcome to QRArt
         </h1>
 
-       <section className="nes-container with-title is-dark">
-         <h3 className="title">Your data</h3>
-         <textarea ref={ref} id="qr_data" cols="30" rows="2" className="nes-textarea" />
-         <button className="nes-btn is-primary is-dark" onClick={sendData}>Generate</button>
-       </section>
+        <section className="nes-container with-title">
+          <h3 className="title">Your data</h3>
+          <textarea ref={ref} id="qr_data" cols="30" rows="2" className="nes-textarea" />
+          <button className="nes-btn is-primary" onClick={sendData}>Generate</button>
+        </section>
 
-        {url &&  <section className="nes-container with-title is-dark">
+        {url && <section className="nes-container with-title">
           <h3 className="title">Your QR code</h3>
-          <img src={url} alt="QR"/>
+          <img src={url} alt="QR" />
         </section>
         }
 
