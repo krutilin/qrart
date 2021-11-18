@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const canvas = createCanvas(512, 512);
   const ctx = canvas.getContext("2d");
 
-  const QR = qrcode(6, "M");
+  const QR = qrcode(6, "Q");
   QR.addData(data);
   QR.make();
 
@@ -92,18 +92,30 @@ export default async function handler(req, res) {
   const cornerSize = 7;
 
   const isCorner = (row, col, count) => {
+    /*var pos =
+      2 [6, 18],
+      3 [6, 22],
+      4 [6, 26],
+      5 [6, 30],
+      6 [6, 34],
+      */
+
+    // adjustPattern
+    let pos = [6, 34];
+
     return (
       (row < 7 && col < 7) ||
       (row < 7 && col >= count - 7) ||
       (col < 7 && row >= count - 7) ||
       col === 6 ||
-      row === 6
+      row === 6 ||
+      (col < 34 + 3 && col > 34 - 3 && row < 34 + 3 && row > 34 - 3)
     );
   };
 
   for (let byteRow = 0; byteRow < QR.getModuleCount(); byteRow++) {
     for (let byteCell = 0; byteCell < QR.getModuleCount(); byteCell++) {
-      // TODO
+      // TODO: calc module shift
       const moduleSize = isCorner(byteRow, byteCell, QR.getModuleCount())
         ? blockSize
         : Math.floor(blockSize / 1.7);
