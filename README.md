@@ -23,3 +23,4 @@ DONE
 * add analytics and sharing
 * app icon
 * instant generate by generate button, using app URI
+* share to social buttons
