@@ -22,9 +22,14 @@
 
 .code-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
+.code-button {
+    margin: 12px 12px 0;
+    width: 140px;
+}
 
 img.qr {
     max-width: 100%;

@@ -6,7 +6,8 @@ import styles from "../styles/Home.module.css";
 const texts = {
   en: {
     title: "QRcode pixel ART generator",
-    description: "Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way",
+    description:
+      "Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way",
     h1: "QR ART generator",
     p: "Generate cool pixel art instead of boring QR code",
     h3_title: "Your data",
@@ -14,11 +15,12 @@ const texts = {
     button: "Generate",
     qr: "Your QR code",
     h3_topic_idea: "Idea",
-    p_topic_idea: ""
+    p_topic_idea: "",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
-    description: "Создавай крутые пиксельные изображения вместо скучных QR-кодов, так называемые полутоновые QR-коды.",
+    description:
+      "Создавай крутые пиксельные изображения вместо скучных QR-кодов, так называемые полутоновые QR-коды.",
     h1: "QR ART генератор",
     p: "Создавай крутые пиксельные рисунки вместо скучного QR-кода",
     h3_title: "Введите данные",
@@ -26,7 +28,7 @@ const texts = {
     button: "Генерируй!",
     qr: "Твой QR код",
     h3_topic_idea: "Идея",
-    p_topic_idea: "Идея"
+    p_topic_idea: "Идея",
   },
 };
 
@@ -75,14 +77,25 @@ export default function Home({ texts }) {
     }
   }, []);
 
+  const share = useCallback(async () => {
+    const blob = await (await fetch(url)).blob();
+    const file = new File([blob], "qrcode.png", { type: blob.type });
+    try {
+      await navigator.share({
+        title: "QRCode",
+        text: "Your QR Code!",
+        files: [file],
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }, [url]);
+
   return (
     <div className={styles.container}>
       <Head>
         <title>{texts.title}</title>
-        <meta
-          name="description"
-          content={texts.description}
-        />
+        <meta name="description" content={texts.description} />
         <link rel="icon" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css?family=Press+Start+2P"
@@ -98,9 +111,7 @@ export default function Home({ texts }) {
         <div className={styles.content}>
           <section className="message-left">
             <i className="nes-bcrikko"></i>
-            <p className="nes-balloon nes-pointer from-left">
-              {texts.p}
-            </p>
+            <p className="nes-balloon nes-pointer from-left">{texts.p}</p>
           </section>
 
           <section className="nes-container with-title section">
@@ -117,10 +128,25 @@ export default function Home({ texts }) {
               <h3 className="title">{texts.qr}</h3>
               <div className="code-container animate__animated animate__bounceInRight">
                 <img className="qr" src={url} alt="QR" />
+
+                <div>
+                  <a
+                    className="code-button nes-btn is-warning"
+                    href={url}
+                    download
+                  >
+                    Download
+                  </a>
+                  <button
+                    className="code-button nes-btn is-error"
+                    onClick={share}
+                  >
+                    Share
+                  </button>
+                </div>
               </div>
             </section>
           )}
-
 
           {/*
           <section className="topic">
@@ -131,12 +157,30 @@ export default function Home({ texts }) {
             <p>{texts.p_topic_idea}</p>
           </section>
           */}
-
-
         </div>
-        <footer><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></footer>
+        <footer>
+          <span>©2021</span>{" "}
+          <a
+            href="https://github.com/alexslavr"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @alexslavr
+          </a>{" "}
+          <span> </span>{" "}
+          <a
+            href="https://github.com/krutilin"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @krutilin
+          </a>
+        </footer>
       </main>
-
+      <script
+        type="text/javascript"
+        src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd"
+      />
     </div>
   );
 }
