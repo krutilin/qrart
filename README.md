@@ -15,6 +15,7 @@ MVP TODO
 * short URL
 
 DONE
+*
 * localization
 * fit qr to image
 * fit qr to iphone screen at least 
