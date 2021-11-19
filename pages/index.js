@@ -102,13 +102,15 @@ export default function Home({ texts }) {
             </section>
           )}
 
-          <section className="topic">
-            <h2 id="1">
-              <a href="#1">#</a>
-              Topic 1
-            </h2>
-            <p>Text 1</p>
-          </section>
+          {/*
+            <section className="topic">
+              <h2 id="1">
+                <a href="#1">#</a>
+                Topic 1
+              </h2>
+              <p>Text 1</p>
+            </section>
+          */}
         </div>
 
         <p>
@@ -130,6 +132,7 @@ export default function Home({ texts }) {
           </a>
         </p>
       </main>
+
     </div>
   );
 }
