@@ -2,7 +2,6 @@
 QR to art processing app
 
 MVP TODO
-* localization
 * app icon
 * template images, also fix current
 * twitter, instagram, fb
@@ -16,3 +15,6 @@ MVP TODO
 * share on mobile and web as navigator share
 * scan existing code
 * short URL
+
+DONE
+* localization
