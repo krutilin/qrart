@@ -2,7 +2,14 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import ScriptLoader from "next/script"
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  TelegramShareButton,
+  TelegramIcon,
+  RedditShareButton,
+  WhatsappShareButton
+} from 'next-share';
 
 const texts = {
   en: {
@@ -17,6 +24,7 @@ const texts = {
     qr: "Your QR code",
     h3_topic_idea: "Idea",
     p_topic_idea: "",
+    h3_topic_share: "Share",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
@@ -30,6 +38,7 @@ const texts = {
     qr: "Твой QR код",
     h3_topic_idea: "Идея",
     p_topic_idea: "Идея",
+    h3_topic_share: "Расшарь в сеточки",
   },
 };
 
@@ -143,6 +152,50 @@ export default function Home({ texts }) {
             <p>{texts.p_topic_idea}</p>
           </section>
           */}
+          <section className="topic">
+            <h3 id="1">
+              <a href="#1">#</a>
+              {texts.h3_topic_share}
+            </h3>
+            <FacebookShareButton
+              url={'https://qrart.app/'}
+              quote={texts.description}
+              hashtag={'#qrcode'}
+            >
+              <i className="nes-icon facebook is-large"></i>
+            </FacebookShareButton>
+
+            <TwitterShareButton
+              url={'https://qrart.app/'}
+              title={texts.description}
+            >
+              <i className="nes-icon twitter is-large"></i>
+            </TwitterShareButton>
+
+            <WhatsappShareButton
+              url={'https://qrart.app/'}
+              title={texts.description}
+              separator=":: "
+            >
+              <i className="nes-icon whatsapp is-large"></i>
+            </WhatsappShareButton>
+
+            <RedditShareButton
+              url={'https://qrart.app/'}
+              title={texts.description}
+            >
+              <i className="nes-icon reddit is-large"></i>
+            </RedditShareButton>
+
+            <TelegramShareButton
+              url={'https://qrart.app/'}
+              title={texts.description}
+            >
+              <TelegramIcon size={68} borderRadius={14} id="telegram" />
+            </TelegramShareButton>
+
+          </section>
+
         </div>
         <footer>
           <span>©2021</span>{" "}
@@ -162,11 +215,8 @@ export default function Home({ texts }) {
             @krutilin
           </a>
         </footer>
+
       </main>
-      <ScriptLoader
-        type="text/javascript"
-        src={"//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd"}
-      />
     </div>
   );
 }
