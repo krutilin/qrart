@@ -112,25 +112,7 @@ export default function Home({ texts }) {
             </section>
           */}
         </div>
-
-        <p>
-          <span>©2021</span>{" "}
-          <a
-            href="https://github.com/alexslavr"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            @alexslavr
-          </a>{" "}
-          <span> </span>{" "}
-          <a
-            href="https://github.com/krutilin"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            @krutilin
-          </a>
-        </p>
+        <footer><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></footer>
       </main>
 
     </div>
