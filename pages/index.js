@@ -32,7 +32,7 @@ export default function Home() {
       });
       const json = await res.json();
       setLoading(false);
-      input.current.value = "";
+      //input.current.value = "";
       setUrl(json.url);
       setImg(json.img);
 
