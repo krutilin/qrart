@@ -17,6 +17,8 @@ const texts = {
     h3_topic_idea: "Idea",
     p_topic_idea: "",
     h3_topic_share: "Share",
+    h3_topic_email: "Have a question",
+    p_topic_email: "Found a bug, need a feature. Just drop us a letter ",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
@@ -31,6 +33,8 @@ const texts = {
     h3_topic_idea: "Идея",
     p_topic_idea: "Идея",
     h3_topic_share: "Расшарь в сеточки",
+    h3_topic_email: "Есть вопросы",
+    p_topic_email: "Нашли баг, нужна фича. Ждем письмо на ",
   },
 };
 
@@ -163,6 +167,13 @@ export default function Home({ texts }) {
             <p>{texts.p_topic_idea}</p>
           </section>
           */}
+          <section className="topic">
+            <h3 id="email">
+              <a href="#email">#</a>
+              {texts.h3_topic_email}
+            </h3>
+            <p>{texts.p_topic_email} <a href="mailto:support@qrart.app">support@qrart.app</a></p>
+          </section>
         </div>
         <footer>
           <span>©2021</span>{" "}

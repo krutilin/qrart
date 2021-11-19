@@ -2,7 +2,6 @@
 QR to art processing app
 
 MVP TODO
-* email to contact and social, use mail forward
 * twitter, instagram, fb
 * template images, also fix current
 * FAQ
@@ -24,4 +23,5 @@ DONE
 * add analytics and sharing
 * app icon
 * instant generate by generate button, using app URI
-* share to social buttons
+* share to social buttons (used addthis app in cloudFlare)
+* email to contact and social, use mail forward
