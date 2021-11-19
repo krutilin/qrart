@@ -89,14 +89,15 @@ export default function Home() {
             </section>
           )}
 
-          <section className="topic">
-            <h2 id="1">
-              <a href="#1">#</a>
-              Topic 1
-            </h2>
-            <p>Text 1</p>
-          </section>
-
+          {/*
+            <section className="topic">
+              <h2 id="1">
+                <a href="#1">#</a>
+                Topic 1
+              </h2>
+              <p>Text 1</p>
+            </section>
+          */}
         </div>
 
         <p><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></p>
