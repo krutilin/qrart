@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
+import ScriptLoader from "next/script"
 
 const texts = {
   en: {
@@ -54,27 +55,29 @@ export default function Home({ texts }) {
   const sendData = useCallback(async () => {
     const data = input.current.value;
 
-    if (data) {
-      setLoading(true);
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ data }),
-      });
-      const json = await res.json();
-      setLoading(false);
-      //input.current.value = "";
-      setUrl(json.url);
-      setImg(json.img);
-
-      setTimeout(() => {
-        if (code) {
-          code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
-        }
-      }, 0);
+    if (!data) {
+      data = "https://qrart.app/"
     }
+    setLoading(true);
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ data }),
+    });
+    const json = await res.json();
+    setLoading(false);
+    input.current.value = data;
+    setUrl(json.url);
+    setImg(json.img);
+
+    setTimeout(() => {
+      if (code) {
+        code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
+    }, 0);
+
   }, []);
 
   return (
@@ -91,7 +94,6 @@ export default function Home({ texts }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
-        <script defer src={`https://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd`}></script>
       </Head>
       <main className={styles.main}>
         <header className={styles.header}>
@@ -161,6 +163,10 @@ export default function Home({ texts }) {
           </a>
         </footer>
       </main>
+      <ScriptLoader
+        type="text/javascript"
+        src={"//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd"}
+      />
     </div>
   );
 }

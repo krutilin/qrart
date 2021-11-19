@@ -22,3 +22,4 @@ DONE
 * fit qr to iphone screen at least 
 * add analytics and sharing
 * app icon
+* instant generate by generate button, using app URI
