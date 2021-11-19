@@ -187,13 +187,6 @@ export default function Home({ texts }) {
               <i className="nes-icon reddit is-large"></i>
             </RedditShareButton>
 
-            <TelegramShareButton
-              url={'https://qrart.app/'}
-              title={texts.description}
-            >
-              <TelegramIcon size={68} borderRadius={14} id="telegram" />
-            </TelegramShareButton>
-
           </section>
 
         </div>
