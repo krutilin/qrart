@@ -54,10 +54,10 @@ export default function Home({ texts }) {
   const [img, setImg] = useState(null);
 
   const sendData = useCallback(async () => {
-    const data = input.current.value;
+    let data = input.current.value;
 
     if (!data) {
-      data = "https://qrart.app/"
+      data = "https://qrart.app/";
     }
     setLoading(true);
     const res = await fetch("/api/generate", {
@@ -91,10 +91,29 @@ export default function Home({ texts }) {
           href="https://fonts.googleapis.com/css?family=Press+Start+2P"
           rel="stylesheet"
         />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
         <link rel="manifest" href="/site.webmanifest" />
+        <script
+          defer
+          data-domain="qrart.app"
+          src="https://itcount.me/js/plausible.js"
+        />
       </Head>
       <main className={styles.main}>
         <header className={styles.header}>
