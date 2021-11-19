@@ -12,17 +12,21 @@ const texts = {
     h3_title: "Your data",
     h4: "URL or text",
     button: "Generate",
-    qr: "Your QR code"
+    qr: "Your QR code",
+    h3_topic_idea: "Idea",
+    p_topic_idea: ""
   },
   ru: {
     title: "QRcode пиксель ART генератор",
-    description: "Создавайте крутые пиксельные изображения вместо скучных QR-кодов, так называемые полутоновые QR-коды.",
+    description: "Создавай крутые пиксельные изображения вместо скучных QR-кодов, так называемые полутоновые QR-коды.",
     h1: "QR ART генератор",
-    p: "Создавайте крутые пиксельные рисунки вместо скучного QR-кода",
+    p: "Создавай крутые пиксельные рисунки вместо скучного QR-кода",
     h3_title: "Введите данные",
     h4: "URL или текст",
     button: "Генерируй!",
-    qr: "Твой QR код"
+    qr: "Твой QR код",
+    h3_topic_idea: "Идея",
+    p_topic_idea: "Идея"
   },
 };
 
@@ -117,15 +121,18 @@ export default function Home({ texts }) {
             </section>
           )}
 
+
           {/*
-            <section className="topic">
-              <h2 id="1">
-                <a href="#1">#</a>
-                Topic 1
-              </h2>
-              <p>Text 1</p>
-            </section>
+          <section className="topic">
+            <h3 id="1">
+              <a href="#1">#</a>
+              {texts.h3_topic_idea}
+            </h3>
+            <p>{texts.p_topic_idea}</p>
+          </section>
           */}
+
+
         </div>
         <footer><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></footer>
       </main>
