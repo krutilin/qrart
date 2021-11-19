@@ -2,7 +2,6 @@
 QR to art processing app
 
 MVP TODO
-* app icon
 * template images, also fix current
 * twitter, instagram, fb
 * FAQ
@@ -15,8 +14,8 @@ MVP TODO
 * short URL
 
 DONE
-*
 * localization
 * fit qr to image
 * fit qr to iphone screen at least 
 * add analytics and sharing
+* app icon
