@@ -6,8 +6,6 @@ MVP TODO
 * template images, also fix current
 * twitter, instagram, fb
 * FAQ
-* fit qr to image
-* fit qr to iphone screen at least
 * waiting animation
 * gallery
 * qr code from image, drag and drop upload
@@ -18,3 +16,5 @@ MVP TODO
 
 DONE
 * localization
+* fit qr to image
+* fit qr to iphone screen at least 
