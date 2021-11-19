@@ -91,6 +91,7 @@ export default function Home({ texts }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <script defer src={`https://s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd`}></script>
       </Head>
       <main className={styles.main}>
         <header className={styles.header}>
