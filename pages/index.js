@@ -3,13 +3,26 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
+const texts = {
+  en: {
+    title: "",
+  },
+  ru: {
+    title: "",
+  },
+};
+
 export async function getServerSideProps(context) {
+  const { locale } = context;
+
   return {
-    props: {},
+    props: {
+      texts: texts[locale],
+    },
   };
 }
 
-export default function Home() {
+export default function Home({ texts }) {
   const input = useRef();
   const code = useRef();
 
@@ -84,7 +97,7 @@ export default function Home() {
             <section ref={code} className="nes-container with-title section">
               <h3 className="title">Your QR code</h3>
               <div className="code-container animate__animated animate__bounceInRight">
-                <img src={url} alt="QR" />
+                <img className="qr" src={url} alt="QR" />
               </div>
             </section>
           )}
@@ -96,12 +109,27 @@ export default function Home() {
             </h2>
             <p>Text 1</p>
           </section>
-
         </div>
 
-        <p><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></p>
+        <p>
+          <span>©2021</span>{" "}
+          <a
+            href="https://github.com/alexslavr"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @alexslavr
+          </a>{" "}
+          <span> </span>{" "}
+          <a
+            href="https://github.com/krutilin"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @krutilin
+          </a>
+        </p>
       </main>
-
     </div>
   );
 }

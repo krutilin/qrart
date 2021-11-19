@@ -24,3 +24,7 @@
     display: flex;
     justify-content: center;
 }
+
+img.qr {
+    max-width: 100%;
+}
