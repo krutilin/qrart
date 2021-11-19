@@ -6,7 +6,7 @@ const { createCanvas, loadImage } = require("canvas");
 const cdn_url =
   "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
 
-const images = ["cat", "dog", "frog", "lol", "troll"];
+const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda"];
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -63,27 +63,27 @@ export default async function handler(req, res) {
     d[((row + 0) * width + (cell + 1)) * 4] =
       d[((row + 0) * width + (cell + 1)) * 4 + 1] =
       d[((row + 0) * width + (cell + 1)) * 4 + 2] =
-        d[((row + 0) * width + (cell + 1)) * 4] + error;
+      d[((row + 0) * width + (cell + 1)) * 4] + error;
     d[((row + 0) * width + (cell + 2)) * 4] =
       d[((row + 0) * width + (cell + 2)) * 4 + 1] =
       d[((row + 0) * width + (cell + 2)) * 4 + 2] =
-        d[((row + 0) * width + (cell + 2)) * 4] + error;
+      d[((row + 0) * width + (cell + 2)) * 4] + error;
     d[((row + 1) * width + (cell - 1)) * 4] =
       d[((row + 1) * width + (cell - 1)) * 4 + 1] =
       d[((row + 1) * width + (cell - 1)) * 4 + 2] =
-        d[((row + 1) * width + (cell - 1)) * 4] + error;
+      d[((row + 1) * width + (cell - 1)) * 4] + error;
     d[((row + 1) * width + (cell + 0)) * 4] =
       d[((row + 1) * width + (cell + 0)) * 4 + 1] =
       d[((row + 1) * width + (cell + 0)) * 4 + 2] =
-        d[((row + 1) * width + (cell + 0)) * 4] + error;
+      d[((row + 1) * width + (cell + 0)) * 4] + error;
     d[((row + 1) * width + (cell + 1)) * 4] =
       d[((row + 1) * width + (cell + 1)) * 4 + 1] =
       d[((row + 1) * width + (cell + 1)) * 4 + 2] =
-        d[((row + 1) * width + (cell + 1)) * 4] + error;
+      d[((row + 1) * width + (cell + 1)) * 4] + error;
     d[((row + 2) * width + (cell + 0)) * 4] =
       d[((row + 2) * width + (cell + 0)) * 4 + 1] =
       d[((row + 2) * width + (cell + 0)) * 4 + 2] =
-        d[((row + 2) * width + (cell + 0)) * 4] + error;
+      d[((row + 2) * width + (cell + 0)) * 4] + error;
   }
   ctx.putImageData(pixels, 0, 0);
 
