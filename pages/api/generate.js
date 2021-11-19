@@ -17,9 +17,6 @@ export default async function handler(req, res) {
 
   const imgSize = 512;
 
-  const canvas = createCanvas(512, 512);
-  const ctx = canvas.getContext("2d");
-
   const QR = qrcode(6, "M");
   QR.addData(data);
   QR.make();
@@ -27,11 +24,16 @@ export default async function handler(req, res) {
   const rndImageIndex = Math.floor(Math.random() * images.length);
   const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
 
-  const image = await loadImage(rndImageUrl);
-  ctx.drawImage(image, 0, 0);
-
   let pixelSize = 1;
   let blockSize = Math.floor((pixelSize * imgSize) / QR.getModuleCount()); // 3 * pixelSize;
+
+  const canvasSize = blockSize * QR.getModuleCount();
+
+  const canvas = createCanvas(canvasSize, canvasSize);
+  const ctx = canvas.getContext("2d");
+
+  const image = await loadImage(rndImageUrl);
+  ctx.drawImage(image, 0, 0);
 
   var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var d = pixels.data;
@@ -61,33 +63,29 @@ export default async function handler(req, res) {
     d[((row + 0) * width + (cell + 1)) * 4] =
       d[((row + 0) * width + (cell + 1)) * 4 + 1] =
       d[((row + 0) * width + (cell + 1)) * 4 + 2] =
-      d[((row + 0) * width + (cell + 1)) * 4] + error;
+        d[((row + 0) * width + (cell + 1)) * 4] + error;
     d[((row + 0) * width + (cell + 2)) * 4] =
       d[((row + 0) * width + (cell + 2)) * 4 + 1] =
       d[((row + 0) * width + (cell + 2)) * 4 + 2] =
-      d[((row + 0) * width + (cell + 2)) * 4] + error;
+        d[((row + 0) * width + (cell + 2)) * 4] + error;
     d[((row + 1) * width + (cell - 1)) * 4] =
       d[((row + 1) * width + (cell - 1)) * 4 + 1] =
       d[((row + 1) * width + (cell - 1)) * 4 + 2] =
-      d[((row + 1) * width + (cell - 1)) * 4] + error;
+        d[((row + 1) * width + (cell - 1)) * 4] + error;
     d[((row + 1) * width + (cell + 0)) * 4] =
       d[((row + 1) * width + (cell + 0)) * 4 + 1] =
       d[((row + 1) * width + (cell + 0)) * 4 + 2] =
-      d[((row + 1) * width + (cell + 0)) * 4] + error;
+        d[((row + 1) * width + (cell + 0)) * 4] + error;
     d[((row + 1) * width + (cell + 1)) * 4] =
       d[((row + 1) * width + (cell + 1)) * 4 + 1] =
       d[((row + 1) * width + (cell + 1)) * 4 + 2] =
-      d[((row + 1) * width + (cell + 1)) * 4] + error;
+        d[((row + 1) * width + (cell + 1)) * 4] + error;
     d[((row + 2) * width + (cell + 0)) * 4] =
       d[((row + 2) * width + (cell + 0)) * 4 + 1] =
       d[((row + 2) * width + (cell + 0)) * 4 + 2] =
-      d[((row + 2) * width + (cell + 0)) * 4] + error;
+        d[((row + 2) * width + (cell + 0)) * 4] + error;
   }
   ctx.putImageData(pixels, 0, 0);
-
-  console.log("module count", QR.getModuleCount());
-
-  console.log(blockSize);
 
   const cornerSize = 7;
 
@@ -115,19 +113,30 @@ export default async function handler(req, res) {
 
   for (let byteRow = 0; byteRow < QR.getModuleCount(); byteRow++) {
     for (let byteCell = 0; byteCell < QR.getModuleCount(); byteCell++) {
-      // TODO: calc module shift
-      const moduleSize = isCorner(byteRow, byteCell, QR.getModuleCount())
-        ? blockSize
-        : Math.floor(blockSize / 1.7);
-
       // Middle Cell
-      ctx.fillStyle = QR.isDark(byteRow, byteCell) ? "black" : "white";
-      ctx.fillRect(
-        byteRow * blockSize + pixelSize,
-        byteCell * blockSize + pixelSize,
-        moduleSize,
-        moduleSize
-      );
+      ctx.fillStyle = ctx.strokeStyle = QR.isDark(byteRow, byteCell)
+        ? "black"
+        : "white";
+
+      if (isCorner(byteRow, byteCell, QR.getModuleCount())) {
+        ctx.fillRect(
+          byteRow * blockSize + pixelSize,
+          byteCell * blockSize + pixelSize,
+          blockSize,
+          blockSize
+        );
+      } else {
+        ctx.beginPath();
+        ctx.arc(
+          byteRow * blockSize + blockSize / 2,
+          byteCell * blockSize + blockSize / 2,
+          Math.round(blockSize / 6),
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+        ctx.stroke();
+      }
     }
   }
 
