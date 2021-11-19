@@ -99,7 +99,7 @@ export default function Home() {
 
         </div>
 
-        <p><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener">@krutilin</a></p>
+        <p><span>©2021</span> <a href="https://github.com/alexslavr" target="_blank" rel="noopener noreferrer">@alexslavr</a> <span> </span> <a href="https://github.com/krutilin" target="_blank" rel="noopener noreferrer">@krutilin</a></p>
       </main>
 
     </div>
