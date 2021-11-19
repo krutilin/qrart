@@ -178,6 +178,7 @@ export default function Home({ texts }) {
         </footer>
       </main>
       <script
+        async
         type="text/javascript"
         src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd"
       />
