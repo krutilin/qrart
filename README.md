@@ -2,14 +2,17 @@
 QR to art processing app
 
 MVP TODO
-* template images, also fix current
+* email to contact and social, use mail forward
 * twitter, instagram, fb
+* template images, also fix current
 * FAQ
 * waiting animation
 * gallery
 * qr code from image, drag and drop upload
 * save as png
 * share on mobile and web as navigator share
+* add to home screen
+  https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Add_to_home_screen
 * scan existing code
 * short URL
 
