@@ -2,14 +2,6 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
-import {
-  FacebookShareButton,
-  TwitterShareButton,
-  TelegramShareButton,
-  TelegramIcon,
-  RedditShareButton,
-  WhatsappShareButton
-} from 'next-share';
 
 const texts = {
   en: {
@@ -152,43 +144,6 @@ export default function Home({ texts }) {
             <p>{texts.p_topic_idea}</p>
           </section>
           */}
-          <section className="topic">
-            <h3 id="1">
-              <a href="#1">#</a>
-              {texts.h3_topic_share}
-            </h3>
-            <FacebookShareButton
-              url={'https://qrart.app/'}
-              quote={texts.description}
-              hashtag={'#qrcode'}
-            >
-              <i className="nes-icon facebook is-large"></i>
-            </FacebookShareButton>
-
-            <TwitterShareButton
-              url={'https://qrart.app/'}
-              title={texts.description}
-            >
-              <i className="nes-icon twitter is-large"></i>
-            </TwitterShareButton>
-
-            <WhatsappShareButton
-              url={'https://qrart.app/'}
-              title={texts.description}
-              separator=":: "
-            >
-              <i className="nes-icon whatsapp is-large"></i>
-            </WhatsappShareButton>
-
-            <RedditShareButton
-              url={'https://qrart.app/'}
-              title={texts.description}
-            >
-              <i className="nes-icon reddit is-large"></i>
-            </RedditShareButton>
-
-          </section>
-
         </div>
         <footer>
           <span>©2021</span>{" "}
