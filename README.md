@@ -4,6 +4,7 @@ QR to art processing app
 MVP TODO
 * localization
 * app icon
+* template images, also fix current
 * twitter, instagram, fb
 * FAQ
 * fit qr to image
