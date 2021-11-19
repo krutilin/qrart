@@ -77,20 +77,6 @@ export default function Home({ texts }) {
     }
   }, []);
 
-  const share = useCallback(async () => {
-    const blob = await (await fetch(url)).blob();
-    const file = new File([blob], "qrcode.png", { type: blob.type });
-    try {
-      await navigator.share({
-        title: "QRCode",
-        text: "Your QR Code!",
-        files: [file],
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }, [url]);
-
   return (
     <div className={styles.container}>
       <Head>
@@ -102,7 +88,6 @@ export default function Home({ texts }) {
           rel="stylesheet"
         />
       </Head>
-
       <main className={styles.main}>
         <header className={styles.header}>
           <h1>{texts.h1}</h1>
@@ -137,12 +122,6 @@ export default function Home({ texts }) {
                   >
                     Download
                   </a>
-                  <button
-                    className="code-button nes-btn is-error"
-                    onClick={share}
-                  >
-                    Share
-                  </button>
                 </div>
               </div>
             </section>
@@ -177,11 +156,6 @@ export default function Home({ texts }) {
           </a>
         </footer>
       </main>
-      <script
-        async
-        type="text/javascript"
-        src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-6197bdf12de16cfd"
-      />
     </div>
   );
 }
