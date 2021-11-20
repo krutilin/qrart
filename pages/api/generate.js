@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Method not allowed" });
   }
 
-  const { data } = req.body;
+  const { data, index } = req.body;
 
   const imgSize = 512;
 
@@ -21,7 +21,9 @@ export default async function handler(req, res) {
   QR.addData(data);
   QR.make();
 
-  const rndImageIndex = Math.floor(Math.random() * images.length);
+  const rndImageIndex =
+    index != null ? index : Math.floor(Math.random() * images.length);
+
   const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
 
   let pixelSize = 1;
@@ -63,27 +65,27 @@ export default async function handler(req, res) {
     d[((row + 0) * width + (cell + 1)) * 4] =
       d[((row + 0) * width + (cell + 1)) * 4 + 1] =
       d[((row + 0) * width + (cell + 1)) * 4 + 2] =
-      d[((row + 0) * width + (cell + 1)) * 4] + error;
+        d[((row + 0) * width + (cell + 1)) * 4] + error;
     d[((row + 0) * width + (cell + 2)) * 4] =
       d[((row + 0) * width + (cell + 2)) * 4 + 1] =
       d[((row + 0) * width + (cell + 2)) * 4 + 2] =
-      d[((row + 0) * width + (cell + 2)) * 4] + error;
+        d[((row + 0) * width + (cell + 2)) * 4] + error;
     d[((row + 1) * width + (cell - 1)) * 4] =
       d[((row + 1) * width + (cell - 1)) * 4 + 1] =
       d[((row + 1) * width + (cell - 1)) * 4 + 2] =
-      d[((row + 1) * width + (cell - 1)) * 4] + error;
+        d[((row + 1) * width + (cell - 1)) * 4] + error;
     d[((row + 1) * width + (cell + 0)) * 4] =
       d[((row + 1) * width + (cell + 0)) * 4 + 1] =
       d[((row + 1) * width + (cell + 0)) * 4 + 2] =
-      d[((row + 1) * width + (cell + 0)) * 4] + error;
+        d[((row + 1) * width + (cell + 0)) * 4] + error;
     d[((row + 1) * width + (cell + 1)) * 4] =
       d[((row + 1) * width + (cell + 1)) * 4 + 1] =
       d[((row + 1) * width + (cell + 1)) * 4 + 2] =
-      d[((row + 1) * width + (cell + 1)) * 4] + error;
+        d[((row + 1) * width + (cell + 1)) * 4] + error;
     d[((row + 2) * width + (cell + 0)) * 4] =
       d[((row + 2) * width + (cell + 0)) * 4 + 1] =
       d[((row + 2) * width + (cell + 0)) * 4 + 2] =
-      d[((row + 2) * width + (cell + 0)) * 4] + error;
+        d[((row + 2) * width + (cell + 0)) * 4] + error;
   }
   ctx.putImageData(pixels, 0, 0);
 

@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
 
 // TODO: "Loading ..."
@@ -42,21 +43,30 @@ const texts = {
 export async function getServerSideProps(context) {
   const { locale } = context;
 
+  const cdn_url =
+    "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
+  const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda"];
+
+  const galleryItems = images.map((image) => ({
+    original: `${cdn_url}${image}.png`,
+  }));
+
   return {
     props: {
       texts: texts[locale],
+      galleryItems,
     },
   };
 }
 
-export default function Home({ texts }) {
+export default function Home({ texts, galleryItems }) {
   const input = useRef();
   const code = useRef();
+  const gallery = useRef();
 
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState(null);
-
-  const [img, setImg] = useState(null);
+  const [showGallery, setShowGallery] = useState(false);
 
   const sendData = useCallback(async () => {
     let data = input.current.value;
@@ -65,25 +75,26 @@ export default function Home({ texts }) {
       data = "https://qrart.app/";
     }
     setLoading(true);
+    const imageIndex = showGallery ? gallery?.current.getCurrentIndex() : null;
+
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data }),
+      body: JSON.stringify({ data, index: imageIndex }),
     });
     const json = await res.json();
     setLoading(false);
     input.current.value = data;
     setUrl(json.url);
-    setImg(json.img);
 
     setTimeout(() => {
       if (code) {
         code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 0);
-  }, []);
+  }, [input, gallery, showGallery]);
 
   return (
     <div className={styles.container}>
@@ -134,6 +145,25 @@ export default function Home({ texts }) {
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
             <input ref={input} type="text" className="nes-input" />
+            <label>
+              <input
+                type="checkbox"
+                className="nes-checkbox"
+                checked={showGallery}
+                onChange={(e) => setShowGallery(e.target.value)}
+              />
+              <span>Выбрать картинку</span>
+            </label>
+            {showGallery && (
+              <ImageGallery
+                ref={gallery}
+                additionalClass="img-gallery animate__animated animate__bounceInDown"
+                items={galleryItems}
+                infinite={false}
+                showPlayButton={false}
+                showFullscreenButton={false}
+              />
+            )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
                 <span className="is-error">Loading ...</span>
