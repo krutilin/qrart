@@ -82,7 +82,6 @@ export default function Home({ texts }) {
         code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 0);
-
   }, []);
 
   return (
@@ -134,9 +133,15 @@ export default function Home({ texts }) {
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
             <input ref={input} type="text" className="nes-input" />
-            <button className="nes-btn is-primary" onClick={sendData}>
-              {texts.button}
-            </button>
+            {loading ? (
+              <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
+                <span className="is-error">Loading ...</span>
+              </div>
+            ) : (
+              <button className="nes-btn is-primary" onClick={sendData}>
+                {texts.button}
+              </button>
+            )}
           </section>
 
           {url && (
@@ -193,7 +198,6 @@ export default function Home({ texts }) {
             @krutilin
           </a>
         </footer>
-
       </main>
     </div>
   );
