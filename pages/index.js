@@ -1,10 +1,9 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
 
-// TODO: "Loading ..."
+// TODO: "Loading ..., select image"
 const texts = {
   en: {
     title: "QRcode pixel ART generator",
@@ -21,6 +20,8 @@ const texts = {
     h3_topic_share: "Share",
     h3_topic_email: "Have a question",
     p_topic_email: "Found a bug, need a feature. Just drop us a letter ",
+    select_image: "Select image",
+    loading: "Loading ...",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
@@ -37,6 +38,8 @@ const texts = {
     h3_topic_share: "Расшарь в сеточки",
     h3_topic_email: "Есть вопросы",
     p_topic_email: "Нашли баг, нужна фича. Ждем письмо на ",
+    select_image: "Выбрать картинку",
+    loading: "Загрузка ...",
   },
 };
 
@@ -145,15 +148,19 @@ export default function Home({ texts, galleryItems }) {
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
             <input ref={input} type="text" className="nes-input" />
-            <label>
-              <input
-                type="checkbox"
-                className="nes-checkbox"
-                checked={showGallery}
-                onChange={(e) => setShowGallery(e.target.value)}
-              />
-              <span>Выбрать картинку</span>
-            </label>
+            <div>
+              <label>
+                <input
+                  type="checkbox"
+                  className="nes-checkbox"
+                  checked={showGallery}
+                  onChange={(e) => {
+                    setShowGallery(e.target.checked);
+                  }}
+                />
+                <span>{texts.select_image}</span>
+              </label>
+            </div>
             {showGallery && (
               <ImageGallery
                 ref={gallery}
@@ -166,7 +173,7 @@ export default function Home({ texts, galleryItems }) {
             )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
-                <span className="is-error">Loading ...</span>
+                <span className="is-error">{texts.loading}</span>
               </div>
             ) : (
               <button className="nes-btn is-primary" onClick={sendData}>

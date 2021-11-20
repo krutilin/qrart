@@ -1,6 +1,4 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 const qrcode = require("qrcode-generator");
-const fs = require("fs");
 const { createCanvas, loadImage } = require("canvas");
 
 const cdn_url =

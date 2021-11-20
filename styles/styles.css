@@ -59,6 +59,12 @@ footer {
     margin-bottom: 16px;
 }
 
+@media only screen and (min-width: 577px) {
+    .img-gallery {
+        max-width: 50%;
+    }
+}
+
 @media only screen and (max-width: 576px) {
     h1 {
         font-size: 1em;
