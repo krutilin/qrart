@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
 import Head from "next/head";
+import { useDropzone } from "react-dropzone";
 import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
 
@@ -62,14 +63,29 @@ export async function getServerSideProps(context) {
   };
 }
 
+const source = ["random", "template", "upload"];
+
 export default function Home({ texts, galleryItems }) {
   const input = useRef();
   const code = useRef();
   const gallery = useRef();
 
+  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    maxSize: 1000000,
+    accept: "image/jpeg, image/png",
+  });
+
+  const file = acceptedFiles?.[0];
+  console.log(file);
+
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState(null);
-  const [showGallery, setShowGallery] = useState(false);
+  const [imgSource, setImgSource] = useState("random");
+
+  const onCheckRadio = useCallback((e) => {
+    setImgSource(e.target.name);
+  }, []);
 
   const sendData = useCallback(async () => {
     let data = input.current.value;
@@ -78,7 +94,7 @@ export default function Home({ texts, galleryItems }) {
       data = "https://qrart.app/";
     }
     setLoading(true);
-    const imageIndex = showGallery ? gallery?.current.getCurrentIndex() : null;
+    const imageIndex = gallery ? gallery?.current.getCurrentIndex() : null;
 
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -97,7 +113,7 @@ export default function Home({ texts, galleryItems }) {
         code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 0);
-  }, [input, gallery, showGallery]);
+  }, [input, gallery]);
 
   return (
     <div className={styles.container}>
@@ -151,17 +167,36 @@ export default function Home({ texts, galleryItems }) {
             <div>
               <label>
                 <input
-                  type="checkbox"
-                  className="nes-checkbox"
-                  checked={showGallery}
-                  onChange={(e) => {
-                    setShowGallery(e.target.checked);
-                  }}
+                  type="radio"
+                  className="nes-radio"
+                  name="random"
+                  checked={imgSource === "random"}
+                  onChange={onCheckRadio}
                 />
-                <span>{texts.select_image}</span>
+                <span>Random</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  className="nes-radio"
+                  name="template"
+                  checked={imgSource === "template"}
+                  onChange={onCheckRadio}
+                />
+                <span>Template</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  className="nes-radio"
+                  name="upload"
+                  checked={imgSource === "upload"}
+                  onChange={onCheckRadio}
+                />
+                <span>Upload</span>
               </label>
             </div>
-            {showGallery && (
+            {imgSource === "template" && (
               <ImageGallery
                 ref={gallery}
                 additionalClass="img-gallery animate__animated animate__bounceInDown"
@@ -170,6 +205,17 @@ export default function Home({ texts, galleryItems }) {
                 showPlayButton={false}
                 showFullscreenButton={false}
               />
+            )}
+            {imgSource === "upload" && (
+              <div
+                {...getRootProps({
+                  className:
+                    "dropzone animate__animated animate__bounceInUp nes-container is-rounded",
+                })}
+              >
+                <input {...getInputProps()} />
+                <p>{`Drag 'n' drop some files here, or click to select files`}</p>
+              </div>
             )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">

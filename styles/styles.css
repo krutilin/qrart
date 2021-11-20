@@ -59,9 +59,14 @@ footer {
     margin-bottom: 16px;
 }
 
+.dropzone {
+    margin-bottom: 16px!important;
+}
+
 @media only screen and (min-width: 577px) {
     .img-gallery {
         max-width: 50%;
+        margin: 0 auto 16px auto;
     }
 }
 
