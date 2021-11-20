@@ -3,6 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 
+// TODO: "Loading ..."
 const texts = {
   en: {
     title: "QRcode pixel ART generator",
@@ -154,7 +155,7 @@ export default function Home({ texts }) {
                   <a
                     className="code-button nes-btn is-warning"
                     href={url}
-                    download
+                    download="qrcode.png"
                   >
                     Download
                   </a>
@@ -177,7 +178,10 @@ export default function Home({ texts }) {
               <a href="#email">#</a>
               {texts.h3_topic_email}
             </h3>
-            <p>{texts.p_topic_email} <a href="mailto:support@qrart.app">support@qrart.app</a></p>
+            <p>
+              {texts.p_topic_email}{" "}
+              <a href="mailto:support@qrart.app">support@qrart.app</a>
+            </p>
           </section>
         </div>
         <footer>
