@@ -34,6 +34,8 @@ export default async function handler(req, res) {
 
     const imgSize = 512;
 
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8']
+
     const QR = qrcode(6, "M");
     QR.addData(data);
     QR.make();
