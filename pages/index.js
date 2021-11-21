@@ -4,6 +4,7 @@ import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
 import Meta from "../components/Meta";
 import RadioGroup from "../components/RadioGroup";
+import Dropzone from "../components/Dropzone";
 import Footer from "../components/Footer";
 
 // TODO: "Loading ..., select image"
@@ -80,15 +81,8 @@ export default function Home({ texts, galleryItems }) {
   const code = useRef();
   const gallery = useRef();
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
-    maxFiles: 1,
-    maxSize: 1000000,
-    accept: "image/jpeg, image/png",
-  });
-  const file = acceptedFiles?.[0];
-  console.log(file);
-
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const [url, setUrl] = useState(null);
 
   // radio buttons
@@ -115,7 +109,7 @@ export default function Home({ texts, galleryItems }) {
       imgSource === "template" ? gallery.current?.getCurrentIndex() : null;
 
     let uploadImg;
-    if (file) {
+    if (file && imgSource === "upload") {
       uploadImg = await readFileAsDataUrl(file);
     }
 
@@ -172,17 +166,7 @@ export default function Home({ texts, galleryItems }) {
                 showFullscreenButton={false}
               />
             )}
-            {imgSource === "upload" && (
-              <div
-                {...getRootProps({
-                  className:
-                    "dropzone animate__animated animate__bounceInUp nes-container is-rounded",
-                })}
-              >
-                <input {...getInputProps()} />
-                <p>{`Drag 'n' drop some files here, or click to select files`}</p>
-              </div>
-            )}
+            {imgSource === "upload" && <Dropzone onFileChange={setFile} />}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
                 <span className="is-error">{texts.loading}</span>

@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Method not allowed" });
   }
 
-  const { data, index } = req.body;
+  const { data, index, file } = req.body;
 
   const imgSize = 512;
 
@@ -22,7 +22,11 @@ export default async function handler(req, res) {
   const rndImageIndex =
     index != null ? index : Math.floor(Math.random() * images.length);
 
-  const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
+  let rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
+
+  if (file) {
+    rndImageUrl = file;
+  }
 
   let pixelSize = 1;
   let blockSize = Math.floor((pixelSize * imgSize) / QR.getModuleCount()); // 3 * pixelSize;
