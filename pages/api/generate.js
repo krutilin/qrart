@@ -4,9 +4,9 @@ const aws = require("aws-sdk");
 const { nanoid } = require("nanoid");
 
 const cdn_url =
-  "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
+  "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 
-const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda"];
+const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda", "hippo", "cat1", "bird", "cat2", "cat3"];
 
 const fileExtension = "png";
 const ENDPOINT = "fra1.digitaloceanspaces.com";
