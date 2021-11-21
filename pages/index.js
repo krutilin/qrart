@@ -187,7 +187,7 @@ export default function Home({ texts, galleryItems }) {
                     href={url}
                     download="qrcode.png"
                   >
-                    Download
+                    {texts.button_download}
                   </a>
                 </div>
               </div>
