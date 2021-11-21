@@ -1,8 +1,10 @@
 import React, { useState, useCallback, useRef } from "react";
-import Head from "next/head";
 import { useDropzone } from "react-dropzone";
 import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
+import Meta from "../components/Meta";
+import RadioGroup from "../components/RadioGroup";
+import Footer from "../components/Footer";
 
 // TODO: "Loading ..., select image"
 const texts = {
@@ -63,7 +65,15 @@ export async function getServerSideProps(context) {
   };
 }
 
-const source = ["random", "template", "upload"];
+async function readFileAsDataUrl(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = (event) => {
+      return resolve(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export default function Home({ texts, galleryItems }) {
   const input = useRef();
@@ -75,18 +85,25 @@ export default function Home({ texts, galleryItems }) {
     maxSize: 1000000,
     accept: "image/jpeg, image/png",
   });
-
   const file = acceptedFiles?.[0];
   console.log(file);
 
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState(null);
-  const [imgSource, setImgSource] = useState("random");
 
+  // radio buttons
+  const [imgSource, setImgSource] = useState("random");
+  // TODO: texts
+  const radioButtons = [
+    { name: "random", title: "Random" },
+    { name: "template", title: "Template" },
+    { name: "upload", title: "Upload" },
+  ];
   const onCheckRadio = useCallback((e) => {
     setImgSource(e.target.name);
   }, []);
 
+  // generate
   const sendData = useCallback(async () => {
     let data = input.current.value;
 
@@ -94,15 +111,22 @@ export default function Home({ texts, galleryItems }) {
       data = "https://qrart.app/";
     }
     setLoading(true);
-    const imageIndex = gallery ? gallery?.current.getCurrentIndex() : null;
+    const imageIndex =
+      imgSource === "template" ? gallery.current?.getCurrentIndex() : null;
+
+    let uploadImg;
+    if (file) {
+      uploadImg = await readFileAsDataUrl(file);
+    }
 
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data, index: imageIndex }),
+      body: JSON.stringify({ data, index: imageIndex, file: uploadImg }),
     });
+
     const json = await res.json();
     setLoading(false);
     input.current.value = data;
@@ -113,42 +137,11 @@ export default function Home({ texts, galleryItems }) {
         code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 0);
-  }, [input, gallery]);
+  }, [input, gallery, file, imgSource]);
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>{texts.title}</title>
-        <meta name="description" content={texts.description} />
-        <link rel="icon" href="/favicon.ico" />
-        <link
-          href="https://fonts.googleapis.com/css?family=Press+Start+2P"
-          rel="stylesheet"
-        />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/favicon-16x16.png"
-        />
-        <link rel="manifest" href="/site.webmanifest" />
-        <script
-          defer
-          data-domain="qrart.app"
-          src="https://itcount.me/js/plausible.js"
-        />
-      </Head>
+      <Meta title={texts.title} description={texts.description} />
       <main className={styles.main}>
         <header className={styles.header}>
           <h1>{texts.h1}</h1>
@@ -164,38 +157,11 @@ export default function Home({ texts, galleryItems }) {
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
             <input ref={input} type="text" className="nes-input" />
-            <div>
-              <label>
-                <input
-                  type="radio"
-                  className="nes-radio"
-                  name="random"
-                  checked={imgSource === "random"}
-                  onChange={onCheckRadio}
-                />
-                <span>Random</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  className="nes-radio"
-                  name="template"
-                  checked={imgSource === "template"}
-                  onChange={onCheckRadio}
-                />
-                <span>Template</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  className="nes-radio"
-                  name="upload"
-                  checked={imgSource === "upload"}
-                  onChange={onCheckRadio}
-                />
-                <span>Upload</span>
-              </label>
-            </div>
+            <RadioGroup
+              items={radioButtons}
+              checkedItem={imgSource}
+              onChange={onCheckRadio}
+            />
             {imgSource === "template" && (
               <ImageGallery
                 ref={gallery}
@@ -267,24 +233,7 @@ export default function Home({ texts, galleryItems }) {
             </p>
           </section>
         </div>
-        <footer>
-          <span>©2021</span>{" "}
-          <a
-            href="https://github.com/alexslavr"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            @alexslavr
-          </a>{" "}
-          <span> </span>{" "}
-          <a
-            href="https://github.com/krutilin"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            @krutilin
-          </a>
-        </footer>
+        <Footer />
       </main>
     </div>
   );
