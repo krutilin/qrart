@@ -15,6 +15,7 @@ MVP TODO
   https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Add_to_home_screen
 * scan existing code
 * short URL
+*
 
 DONE
 * localization
