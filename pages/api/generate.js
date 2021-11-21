@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     const imgSize = 512;
 
     const QR = qrcode(6, "M");
-    QR.addData(data, 'Alphanumeric');
+    QR.addData(data);
     QR.make();
 
     const rndImageIndex =
