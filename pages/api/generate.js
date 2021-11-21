@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const ctx = canvas.getContext("2d");
 
   const image = await loadImage(rndImageUrl);
-  ctx.drawImage(image, 0, 0);
+  ctx.drawImage(image, 0, 0, canvasSize, canvasSize);
 
   var pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
   var d = pixels.data;

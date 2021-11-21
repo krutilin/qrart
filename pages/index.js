@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useRef } from "react";
-import { useDropzone } from "react-dropzone";
 import ImageGallery from "react-image-gallery";
 import styles from "../styles/Home.module.css";
 import Meta from "../components/Meta";
@@ -108,17 +107,12 @@ export default function Home({ texts, galleryItems }) {
     const imageIndex =
       imgSource === "template" ? gallery.current?.getCurrentIndex() : null;
 
-    let uploadImg;
-    if (file && imgSource === "upload") {
-      uploadImg = await readFileAsDataUrl(file);
-    }
-
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data, index: imageIndex, file: uploadImg }),
+      body: JSON.stringify({ data, index: imageIndex, file: file }),
     });
 
     const json = await res.json();

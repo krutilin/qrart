@@ -1,7 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
+const canvasSize = 512;
+
 const Dropzone = ({ onFileChange }) => {
+  const canvas = useRef(null);
+  const [showCanvas, setShowCanvas] = useState(false);
+
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 1000000,
@@ -9,8 +14,24 @@ const Dropzone = ({ onFileChange }) => {
   });
 
   const file = acceptedFiles?.[0];
+
+  const reader = new FileReader();
+  reader.onloadend = (event) => {
+    setShowCanvas(true);
+    const ctx = canvas.current.getContext("2d");
+
+    const img = new Image();
+    img.src = event.target.result;
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvasSize, canvasSize);
+      onFileChange(canvas.current.toDataURL());
+    };
+  };
+
   useEffect(() => {
-    onFileChange(file);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
     return () => onFileChange(null);
   }, [file, onFileChange]);
 
@@ -26,9 +47,9 @@ const Dropzone = ({ onFileChange }) => {
         <p>{`Drag 'n' drop some files here, or click to select files`}</p>
       </div>
 
-      {file != null && (
+      {showCanvas && (
         <div className="preview">
-          <img src={URL.createObjectURL(file)} alt="Preview" />
+          <canvas ref={canvas} width={512} height={512} />
         </div>
       )}
     </div>
