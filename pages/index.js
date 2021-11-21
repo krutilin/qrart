@@ -150,7 +150,12 @@ export default function Home({ texts, galleryItems }) {
                 showFullscreenButton={false}
               />
             )}
-            {imgSource === "upload" && <Dropzone onFileChange={setFile} />}
+            {imgSource === "upload" && (
+              <Dropzone
+                message={`Drag 'n' drop some files here, or click to select files`}
+                onFileChange={setFile}
+              />
+            )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
                 <span className="is-error">{texts.loading}</span>

@@ -3,7 +3,7 @@ import { useDropzone } from "react-dropzone";
 
 const canvasSize = 512;
 
-const Dropzone = ({ onFileChange }) => {
+const Dropzone = ({ message, onFileChange }) => {
   const canvas = useRef(null);
   const [showCanvas, setShowCanvas] = useState(false);
 
@@ -44,7 +44,7 @@ const Dropzone = ({ onFileChange }) => {
         })}
       >
         <input {...getInputProps()} />
-        <p>{`Drag 'n' drop some files here, or click to select files`}</p>
+        <p>{message}</p>
       </div>
 
       {showCanvas && (
