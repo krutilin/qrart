@@ -12,6 +12,13 @@ const fileExtension = "png";
 const ENDPOINT = "fra1.digitaloceanspaces.com";
 const BUCKET = "qrart";
 
+aws.config.update({
+  'credentials': {
+    'accessKeyId': process.env.MY_AWS_ACCESS_KEY_ID,
+    'secretAccessKey': process.env.MY_AWS_SECRET_ACCESS_KEY
+  }
+})
+
 const spacesEndpoint = new aws.Endpoint(ENDPOINT);
 const s3 = new aws.S3({
   endpoint: spacesEndpoint,
@@ -79,27 +86,27 @@ export default async function handler(req, res) {
       d[((row + 0) * width + (cell + 1)) * 4] =
         d[((row + 0) * width + (cell + 1)) * 4 + 1] =
         d[((row + 0) * width + (cell + 1)) * 4 + 2] =
-          d[((row + 0) * width + (cell + 1)) * 4] + error;
+        d[((row + 0) * width + (cell + 1)) * 4] + error;
       d[((row + 0) * width + (cell + 2)) * 4] =
         d[((row + 0) * width + (cell + 2)) * 4 + 1] =
         d[((row + 0) * width + (cell + 2)) * 4 + 2] =
-          d[((row + 0) * width + (cell + 2)) * 4] + error;
+        d[((row + 0) * width + (cell + 2)) * 4] + error;
       d[((row + 1) * width + (cell - 1)) * 4] =
         d[((row + 1) * width + (cell - 1)) * 4 + 1] =
         d[((row + 1) * width + (cell - 1)) * 4 + 2] =
-          d[((row + 1) * width + (cell - 1)) * 4] + error;
+        d[((row + 1) * width + (cell - 1)) * 4] + error;
       d[((row + 1) * width + (cell + 0)) * 4] =
         d[((row + 1) * width + (cell + 0)) * 4 + 1] =
         d[((row + 1) * width + (cell + 0)) * 4 + 2] =
-          d[((row + 1) * width + (cell + 0)) * 4] + error;
+        d[((row + 1) * width + (cell + 0)) * 4] + error;
       d[((row + 1) * width + (cell + 1)) * 4] =
         d[((row + 1) * width + (cell + 1)) * 4 + 1] =
         d[((row + 1) * width + (cell + 1)) * 4 + 2] =
-          d[((row + 1) * width + (cell + 1)) * 4] + error;
+        d[((row + 1) * width + (cell + 1)) * 4] + error;
       d[((row + 2) * width + (cell + 0)) * 4] =
         d[((row + 2) * width + (cell + 0)) * 4 + 1] =
         d[((row + 2) * width + (cell + 0)) * 4 + 2] =
-          d[((row + 2) * width + (cell + 0)) * 4] + error;
+        d[((row + 2) * width + (cell + 0)) * 4] + error;
     }
     ctx.putImageData(pixels, 0, 0);
 
