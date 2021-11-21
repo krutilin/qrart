@@ -28,7 +28,7 @@ const texts = {
     button_template: "Template",
     button_upload: "Upload",
     button_download: "Download",
-    zone_drop: "Drag 'n' drop some files here, or click to select files"
+    zone_drop: "Drag 'n' drop some files here, or click to select files",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
@@ -51,15 +51,14 @@ const texts = {
     button_template: "По шаблону",
     button_upload: "Своя",
     button_download: "Скачать",
-    zone_drop: "Дропни картинку или выбери из файлов"
+    zone_drop: "Дропни картинку или выбери из файлов",
   },
 };
 
 export async function getServerSideProps(context) {
   const { locale } = context;
 
-  const cdn_url =
-    "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
+  const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 
   const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda", "hippo", "cat1", "bird", "cat2", "cat3"];
 
@@ -123,7 +122,7 @@ export default function Home({ texts, galleryItems }) {
       if (code) {
         code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
-    }, 0);
+    }, 100);
   }, [input, gallery, file, imgSource]);
 
   return (
@@ -160,10 +159,7 @@ export default function Home({ texts, galleryItems }) {
               />
             )}
             {imgSource === "upload" && (
-              <Dropzone
-                message={texts.zone_drop}
-                onFileChange={setFile}
-              />
+              <Dropzone message={texts.zone_drop} onFileChange={setFile} />
             )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
@@ -179,7 +175,7 @@ export default function Home({ texts, galleryItems }) {
           {url && (
             <section ref={code} className="nes-container with-title section">
               <h3 className="title">{texts.qr}</h3>
-              <div className="code-container animate__animated animate__bounceInRight">
+              <div className="code-container animate__animated animate__bounceInUp">
                 <img className="qr" src={url} alt="QR" />
 
                 <div>
