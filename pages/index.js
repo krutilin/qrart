@@ -65,16 +65,6 @@ export async function getServerSideProps(context) {
   };
 }
 
-async function readFileAsDataUrl(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onloadend = (event) => {
-      return resolve(event.target.result);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
 export default function Home({ texts, galleryItems }) {
   const input = useRef();
   const code = useRef();
