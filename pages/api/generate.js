@@ -1,10 +1,21 @@
 const qrcode = require("qrcode-generator");
 const { createCanvas, loadImage } = require("canvas");
+const aws = require("aws-sdk");
+const { nanoid } = require("nanoid");
 
 const cdn_url =
   "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
 
 const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda"];
+
+const fileExtension = "png";
+const ENDPOINT = "fra1.digitaloceanspaces.com";
+const BUCKET = "qrart";
+
+const spacesEndpoint = new aws.Endpoint(ENDPOINT);
+const s3 = new aws.S3({
+  endpoint: spacesEndpoint,
+});
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -144,5 +155,18 @@ export default async function handler(req, res) {
     }
   }
 
-  res.status(200).json({ url: canvas.toDataURL() });
+  const buffer = canvas.toBuffer();
+  const key = `res/${nanoid(10)}/qrcode.${fileExtension}`;
+
+  const params = {
+    Body: buffer,
+    Bucket: BUCKET,
+    Key: key,
+    ACL: "public-read",
+  };
+
+  await s3.putObject(params).promise();
+  const url = `https://${BUCKET}.${ENDPOINT}/${key}`;
+
+  res.status(200).json({ url });
 }
