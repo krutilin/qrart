@@ -59,8 +59,9 @@ export async function getServerSideProps(context) {
   const { locale } = context;
 
   const cdn_url =
-    "https://cdn-img.fra1.cdn.digitaloceanspaces.com/qrart-app/png/";
-  const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda"];
+    "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
+
+  const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda", "hippo", "cat1", "bird", "cat2", "cat3"];
 
   const galleryItems = images.map((image) => ({
     original: `${cdn_url}${image}.png`,
