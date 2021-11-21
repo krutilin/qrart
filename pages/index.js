@@ -6,7 +6,6 @@ import RadioGroup from "../components/RadioGroup";
 import Dropzone from "../components/Dropzone";
 import Footer from "../components/Footer";
 
-// TODO: "Loading ..., select image"
 const texts = {
   en: {
     title: "QRcode pixel ART generator",
@@ -25,6 +24,11 @@ const texts = {
     p_topic_email: "Found a bug, need a feature. Just drop us a letter ",
     select_image: "Select image",
     loading: "Loading ...",
+    button_random: "Random",
+    button_template: "Template",
+    button_upload: "Upload",
+    button_download: "Download",
+    zone_drop: "Drag 'n' drop some files here, or click to select files"
   },
   ru: {
     title: "QRcode пиксель ART генератор",
@@ -43,6 +47,11 @@ const texts = {
     p_topic_email: "Нашли баг, нужна фича. Ждем письмо на ",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
+    button_random: "Рандом",
+    button_template: "По шаблону",
+    button_upload: "Своя",
+    button_download: "Скачать",
+    zone_drop: "Дропни картинку или выбери из файлов"
   },
 };
 
@@ -76,11 +85,10 @@ export default function Home({ texts, galleryItems }) {
 
   // radio buttons
   const [imgSource, setImgSource] = useState("random");
-  // TODO: texts
   const radioButtons = [
-    { name: "random", title: "Random" },
-    { name: "template", title: "Template" },
-    { name: "upload", title: "Upload" },
+    { name: "random", title: texts.button_random },
+    { name: "template", title: texts.button_template },
+    { name: "upload", title: texts.button_upload },
   ];
   const onCheckRadio = useCallback((e) => {
     setImgSource(e.target.name);
@@ -152,7 +160,7 @@ export default function Home({ texts, galleryItems }) {
             )}
             {imgSource === "upload" && (
               <Dropzone
-                message={`Drag 'n' drop some files here, or click to select files`}
+                message={texts.zone_drop}
                 onFileChange={setFile}
               />
             )}
@@ -186,15 +194,6 @@ export default function Home({ texts, galleryItems }) {
             </section>
           )}
 
-          {/*
-          <section className="topic">
-            <h3 id="1">
-              <a href="#1">#</a>
-              {texts.h3_topic_idea}
-            </h3>
-            <p>{texts.p_topic_idea}</p>
-          </section>
-          */}
           <section className="topic">
             <h3 id="email">
               <a href="#email">#</a>
