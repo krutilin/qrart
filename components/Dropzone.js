@@ -9,7 +9,7 @@ const Dropzone = ({ message, onFileChange }) => {
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
-    maxSize: 1000000,
+    maxSize: 20000000,
     accept: "image/jpeg, image/png",
   });
 
