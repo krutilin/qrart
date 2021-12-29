@@ -60,7 +60,20 @@ export async function getServerSideProps(context) {
 
   const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 
-  const images = ["cat", "dog", "frog", "lol", "troll", "mona-lisa", "yoda", "hippo", "cat1", "bird", "cat2", "cat3"];
+  const images = [
+    "cat",
+    "dog",
+    "frog",
+    "lol",
+    "troll",
+    "mona-lisa",
+    "yoda",
+    "hippo",
+    "cat1",
+    "bird",
+    "cat2",
+    "cat3",
+  ];
 
   const galleryItems = images.map((image) => ({
     original: `${cdn_url}${image}.png`,
@@ -119,8 +132,8 @@ export default function Home({ texts, galleryItems }) {
     setUrl(json.url);
 
     setTimeout(() => {
-      if (code) {
-        code?.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      if (code.current) {
+        code.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 100);
   }, [input, gallery, file, imgSource]);

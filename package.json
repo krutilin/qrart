@@ -5,21 +5,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "vercel-build": "yum install libuuid-devel libmount-devel zlib && cp /lib64/{libuuid,libmount,libblkid,libz}.so.1 node_modules/canvas/build/Release/ && npm run build"
+    "lint": "next lint"
   },
   "dependencies": {
     "animate.css": "4.1.1",
     "aws-sdk": "^2.1033.0",
-    "canvas": "2.6.1",
     "nanoid": "3.1.30",
     "nes.css": "2.3.0",
     "next": "12.0.3",
-    "qrcode-generator": "1.4.4",
+    "node-fetch": "3.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-dropzone": "^11.4.2",
-    "react-image-gallery": "1.2.7"
+    "react-dropzone": "11.4.2",
+    "react-image-gallery": "1.2.7",
+    "sharp": "0.29.3"
   },
   "devDependencies": {
     "eslint": "7",
