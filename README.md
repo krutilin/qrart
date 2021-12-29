@@ -25,3 +25,4 @@ DONE
 * gallery
 * save as png
 * qr code from image, drag and drop upload
+*
