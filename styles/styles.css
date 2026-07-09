@@ -27,15 +27,6 @@
     margin-top: 3rem;
 }
 
-.topic i {
-    margin-left: 10px;
-}
-
-#telegram {
-    margin-left: 10px;
-    vertical-align:bottom;
-}
-
 .code-container {
     display: flex;
     flex-direction: column;

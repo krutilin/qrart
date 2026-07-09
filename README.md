@@ -60,7 +60,7 @@ GIF search and random GIFs are powered by [GIPHY](https://giphy.com/). The offic
 
 ## Repository Notes
 
-- `png/` contains built-in template source assets used by the app.
+- `png/` contains source images for the built-in template set.
 - `.env` and other local environment files are intentionally ignored.
 - Generated Next.js output (`.next/`) is intentionally ignored.
 
