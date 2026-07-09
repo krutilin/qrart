@@ -12,8 +12,6 @@
   },
   "dependencies": {
     "animate.css": "4.1.1",
-    "aws-sdk": "^2.1033.0",
-    "nanoid": "3.1.30",
     "nes.css": "2.3.0",
     "next": "12.0.3",
     "node-fetch": "3.1.0",
