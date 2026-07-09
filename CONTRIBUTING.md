@@ -26,4 +26,4 @@ npm run lint
 
 ## Code Style
 
-Follow the existing code style. The project currently uses Next.js 12, React 17, and CommonJS-compatible server code in API routes.
+Follow the existing code style. The project currently uses Next.js 16, React 19, and CommonJS-compatible server code in API routes.
