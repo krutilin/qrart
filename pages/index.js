@@ -1,22 +1,23 @@
-import React, { useState, useCallback, useRef } from "react";
-import ImageGallery from "react-image-gallery";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import styles from "../styles/Home.module.css";
 import Meta from "../components/Meta";
 import RadioGroup from "../components/RadioGroup";
 import Dropzone from "../components/Dropzone";
 import Footer from "../components/Footer";
+import GiphyPicker from "../components/GiphyPicker";
+import TemplatePicker from "../components/TemplatePicker";
 
 const texts = {
   en: {
     title: "QRcode pixel ART generator",
     description:
-      "Generate cool pixel art instead of boring QR code, make so-called halftone QR codes in a fun way",
-    h1: "QR ART generator",
-    p: "Generate cool pixel art instead of boring QR code",
-    h3_title: "Your data",
-    h4: "URL or text",
-    button: "Generate",
-    qr: "Your QR code",
+      "Make animated QR GIFs from GIPHY backgrounds and your own links",
+    h1: "Animated QR GIFs",
+    p: "Turn any link into a moving QR code with GIF energy.",
+    h3_title: "Make it move",
+    h4: "Paste URL or text",
+    button: "Make animated QR",
+    qr: "Your animated QR",
     h3_topic_idea: "Idea",
     p_topic_idea: "",
     h3_topic_share: "Share",
@@ -27,19 +28,25 @@ const texts = {
     button_random: "Random",
     button_template: "Template",
     button_upload: "Upload",
+    button_giphy: "Animated GIF",
     button_download: "Download",
+    giphy_search: "Find GIFs",
+    giphy_search_placeholder: "GIF topic, e.g. cats, party, skate",
+    giphy_missing_key: "Set NEXT_PUBLIC_GIPHY_API_KEY in .env to search GIFs",
+    giphy_selected: "Selected animated GIF",
+    template_selected: "Selected template",
     zone_drop: "Drag 'n' drop some files here, or click to select files",
   },
   ru: {
     title: "QRcode пиксель ART генератор",
     description:
-      "Создавай крутые пиксельные изображения вместо скучных QR-кодов, так называемые полутоновые QR-коды.",
-    h1: "QR ART генератор",
-    p: "Создавай крутые пиксельные рисунки вместо скучного QR-кода",
-    h3_title: "Введите данные",
-    h4: "URL или текст",
-    button: "Генерируй!",
-    qr: "Твой QR код",
+      "Делай анимированные QR-гивки из GIPHY и своих ссылок.",
+    h1: "Анимированные QR-гивки",
+    p: "Преврати любую ссылку в живой QR-код на GIF-фоне.",
+    h3_title: "Сделай QR живым",
+    h4: "Вставь URL или текст",
+    button: "Сделать QR-гивку",
+    qr: "Твоя QR-гивка",
     h3_topic_idea: "Идея",
     p_topic_idea: "Идея",
     h3_topic_share: "Расшарь в сеточки",
@@ -50,7 +57,13 @@ const texts = {
     button_random: "Рандом",
     button_template: "По шаблону",
     button_upload: "Своя",
+    button_giphy: "GIF-анимация",
     button_download: "Скачать",
+    giphy_search: "Найти GIF",
+    giphy_search_placeholder: "Тема GIF: коты, party, skate",
+    giphy_missing_key: "Добавь NEXT_PUBLIC_GIPHY_API_KEY в .env для поиска GIF",
+    giphy_selected: "Выбранная анимированная GIF",
+    template_selected: "Выбранный шаблон",
     zone_drop: "Дропни картинку или выбери из файлов",
   },
 };
@@ -90,22 +103,49 @@ export async function getServerSideProps(context) {
 export default function Home({ texts, galleryItems }) {
   const input = useRef();
   const code = useRef();
-  const gallery = useRef();
+  const giphyApiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY || null;
 
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
+  const [giphyUrl, setGiphyUrl] = useState(null);
+  const [templateIndex, setTemplateIndex] = useState(0);
   const [url, setUrl] = useState(null);
+  const [downloadName, setDownloadName] = useState("qrcode.gif");
+  const onGiphyChange = useCallback((nextGiphyUrl) => {
+    setGiphyUrl(nextGiphyUrl);
+  }, []);
+  const clearGeneratedQr = useCallback(() => {
+    setUrl((previousUrl) => {
+      if (previousUrl) {
+        URL.revokeObjectURL(previousUrl);
+      }
+      return null;
+    });
+    setDownloadName("qrcode.gif");
+  }, []);
 
   // radio buttons
-  const [imgSource, setImgSource] = useState("random");
+  const [imgSource, setImgSource] = useState("giphy");
   const radioButtons = [
-    { name: "random", title: texts.button_random },
+    { name: "giphy", title: texts.button_giphy },
     { name: "template", title: texts.button_template },
+    { name: "random", title: texts.button_random },
     { name: "upload", title: texts.button_upload },
   ];
-  const onCheckRadio = useCallback((e) => {
-    setImgSource(e.target.name);
-  }, []);
+  const onCheckRadio = useCallback(
+    (e) => {
+      setImgSource((previousSource) => {
+        if (previousSource !== e.target.name) {
+          clearGeneratedQr();
+        }
+        return e.target.name;
+      });
+    },
+    [clearGeneratedQr]
+  );
+  const canGenerate =
+    (imgSource !== "giphy" || Boolean(giphyUrl)) &&
+    (imgSource !== "upload" || Boolean(file));
 
   // generate
   const sendData = useCallback(async () => {
@@ -115,28 +155,51 @@ export default function Home({ texts, galleryItems }) {
       data = "https://qrart.app/";
     }
     setLoading(true);
-    const imageIndex =
-      imgSource === "template" ? gallery.current?.getCurrentIndex() : null;
+    const imageIndex = imgSource === "template" ? templateIndex : null;
 
     const res = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ data, index: imageIndex, file: file }),
+      body: JSON.stringify({
+        data,
+        index: imageIndex,
+        file: imgSource === "upload" ? file : null,
+        giphyUrl: imgSource === "giphy" ? giphyUrl : null,
+      }),
     });
 
-    const json = await res.json();
+    if (!res.ok) {
+      setLoading(false);
+      return;
+    }
+
+    const contentType = res.headers.get("content-type") || "";
+    const blob = await res.blob();
+    const nextUrl = URL.createObjectURL(blob);
     setLoading(false);
     input.current.value = data;
-    setUrl(json.url);
+    setUrl((previousUrl) => {
+      if (previousUrl) {
+        URL.revokeObjectURL(previousUrl);
+      }
+      return nextUrl;
+    });
+    setDownloadName(contentType.includes("gif") ? "qrcode.gif" : "qrcode.jpg");
 
     setTimeout(() => {
       if (code.current) {
         code.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 100);
-  }, [input, gallery, file, imgSource]);
+  }, [input, file, giphyUrl, imgSource, templateIndex]);
+
+  useEffect(() => () => {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  }, [url]);
 
   return (
     <div className={styles.container}>
@@ -152,7 +215,7 @@ export default function Home({ texts, galleryItems }) {
             <p className="nes-balloon nes-pointer from-left">{texts.p}</p>
           </section>
 
-          <section className="nes-container with-title section">
+          <section className="hero-panel section">
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
             <input ref={input} type="text" className="nes-input" />
@@ -162,24 +225,32 @@ export default function Home({ texts, galleryItems }) {
               onChange={onCheckRadio}
             />
             {imgSource === "template" && (
-              <ImageGallery
-                ref={gallery}
-                additionalClass="img-gallery animate__animated animate__bounceInDown"
+              <TemplatePicker
                 items={galleryItems}
-                infinite={false}
-                showPlayButton={false}
-                showFullscreenButton={false}
+                texts={texts}
+                onTemplateChange={setTemplateIndex}
               />
             )}
             {imgSource === "upload" && (
               <Dropzone message={texts.zone_drop} onFileChange={setFile} />
+            )}
+            {imgSource === "giphy" && (
+              <GiphyPicker
+                apiKey={giphyApiKey}
+                texts={texts}
+                onGifChange={onGiphyChange}
+              />
             )}
             {loading ? (
               <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
                 <span className="is-error">{texts.loading}</span>
               </div>
             ) : (
-              <button className="nes-btn is-primary" onClick={sendData}>
+              <button
+                className="nes-btn is-primary"
+                disabled={!canGenerate}
+                onClick={sendData}
+              >
                 {texts.button}
               </button>
             )}
@@ -195,7 +266,7 @@ export default function Home({ texts, galleryItems }) {
                   <a
                     className="code-button nes-btn is-warning"
                     href={url}
-                    download="qrcode.png"
+                    download={downloadName}
                   >
                     {texts.button_download}
                   </a>
