@@ -136,6 +136,11 @@ footer {
     color: #e76e55;
 }
 
+.generate-error {
+    color: #e76e55;
+    margin-top: 16px;
+}
+
 .giphy-attribution {
     display: inline-block;
     margin-top: 12px;

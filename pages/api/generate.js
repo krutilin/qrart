@@ -63,23 +63,14 @@ export default async function handler(req, res) {
     } else if (giphyUrl) {
       useGifOutput = true;
       sourceImagePath = path.join(tempDir, "source.gif");
-      try {
-        await writeRemoteGiphy(giphyUrl, sourceImagePath);
-      } catch (e) {
-        console.log(e);
-        useGifOutput = false;
-        sourceImagePath = path.join(tempDir, "source.png");
-        await writeTemplateImage(Math.floor(Math.random() * images.length), sourceImagePath);
-      }
+      await writeRemoteGiphy(giphyUrl, sourceImagePath);
     } else if (index != null) {
       sourceImagePath = path.join(tempDir, "source.png");
       await writeTemplateImage(index, sourceImagePath);
     } else {
-      useGifOutput = await writeRandomGiphy(path.join(tempDir, "source.gif"));
-      sourceImagePath = path.join(tempDir, useGifOutput ? "source.gif" : "source.png");
-      if (!useGifOutput) {
-        await writeTemplateImage(Math.floor(Math.random() * images.length), sourceImagePath);
-      }
+      useGifOutput = true;
+      sourceImagePath = path.join(tempDir, "source.gif");
+      await writeRandomGiphy(sourceImagePath);
     }
 
     const { qrName } = await run(data, {
@@ -104,7 +95,9 @@ export default async function handler(req, res) {
     res.status(200).send(qr);
   } catch (e) {
     console.log(e);
-    res.status(500).json({ error: "Internal server error!" });
+    res.status(e.statusCode || 500).json({
+      error: e.publicMessage || "Internal server error!",
+    });
   } finally {
     if (tempDir) {
       await fs.rm(tempDir, { force: true, recursive: true });
@@ -134,17 +127,33 @@ const writeTemplateImage = async (index, outputPath) => {
 };
 
 const writeRemoteGiphy = async (imageUrl, outputPath) => {
-  const url = normalizeGiphyImageUrl(imageUrl);
-  if (url.protocol !== "https:" || !isGiphyHost(url.hostname)) {
-    throw new Error("Invalid GIPHY image URL");
+  let url;
+  try {
+    url = normalizeGiphyImageUrl(imageUrl);
+  } catch (e) {
+    throw new PublicApiError(400, "Invalid GIPHY image URL");
   }
 
-  const imgRes = await fetchWithTimeout(url.toString(), GIF_FETCH_TIMEOUT_MS);
+  if (url.protocol !== "https:" || !isGiphyHost(url.hostname)) {
+    throw new PublicApiError(400, "Invalid GIPHY image URL");
+  }
+
+  let imgRes;
+  try {
+    imgRes = await fetchWithTimeout(url.toString(), GIF_FETCH_TIMEOUT_MS);
+  } catch (e) {
+    throw new PublicApiError(422, "Could not load this GIF. Try another one.");
+  }
+
   if (!imgRes.ok) {
-    throw new Error("Failed to fetch GIPHY image");
+    throw new PublicApiError(422, "Could not load this GIF. Try another one.");
   }
   const buf = Buffer.from(await imgRes.arrayBuffer());
-  await writeSquareGif(buf, outputPath);
+  try {
+    await writeSquareGif(buf, outputPath);
+  } catch (e) {
+    throw new PublicApiError(422, "Could not process this GIF. Try a smaller one.");
+  }
 };
 
 const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
@@ -162,7 +171,7 @@ const normalizeGiphyImageUrl = (imageUrl) => {
 const writeRandomGiphy = async (outputPath) => {
   const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
   if (!apiKey) {
-    return false;
+    throw new PublicApiError(503, "GIF search is not configured.");
   }
 
   try {
@@ -178,14 +187,15 @@ const writeRandomGiphy = async (outputPath) => {
       json.data?.images?.downsized?.url ||
       json.data?.images?.original?.url;
     if (!giphyRes.ok || !imageUrl) {
-      return false;
+      throw new PublicApiError(422, "Could not find a random GIF. Try again.");
     }
 
     await writeRemoteGiphy(imageUrl, outputPath);
-    return true;
   } catch (e) {
-    console.log(e);
-    return false;
+    if (e.statusCode) {
+      throw e;
+    }
+    throw new PublicApiError(422, "Could not generate a random GIF. Try again.");
   }
 };
 
@@ -205,3 +215,11 @@ const fetchWithTimeout = async (url, timeoutMs) => {
     clearTimeout(timeout);
   }
 };
+
+class PublicApiError extends Error {
+  constructor(statusCode, publicMessage) {
+    super(publicMessage);
+    this.statusCode = statusCode;
+    this.publicMessage = publicMessage;
+  }
+}

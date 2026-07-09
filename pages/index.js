@@ -37,6 +37,7 @@ const texts = {
     giphy_search: "Find GIFs",
     giphy_search_placeholder: "GIF topic, e.g. cats, party, skate",
     giphy_missing_key: "Set NEXT_PUBLIC_GIPHY_API_KEY in .env to search GIFs",
+    generation_error: "Could not generate this QR. Try another GIF.",
     giphy_selected: "Selected animated GIF",
     template_selected: "Selected template",
     zone_drop: "Drag 'n' drop some files here, or click to select files",
@@ -70,6 +71,7 @@ const texts = {
     giphy_search: "Найти GIF",
     giphy_search_placeholder: "Тема GIF: коты, party, skate",
     giphy_missing_key: "Добавь NEXT_PUBLIC_GIPHY_API_KEY в .env для поиска GIF",
+    generation_error: "Не получилось сгенерировать QR. Попробуй другую гифку.",
     giphy_selected: "Выбранная анимированная GIF",
     template_selected: "Выбранный шаблон",
     zone_drop: "Дропни картинку или выбери из файлов",
@@ -118,11 +120,13 @@ export default function Home({ texts, galleryItems }) {
   const [giphyUrl, setGiphyUrl] = useState(null);
   const [templateIndex, setTemplateIndex] = useState(0);
   const [url, setUrl] = useState(null);
+  const [generateError, setGenerateError] = useState(null);
   const [downloadName, setDownloadName] = useState("qrcode.gif");
   const onGiphyChange = useCallback((nextGiphyUrl) => {
     setGiphyUrl(nextGiphyUrl);
   }, []);
   const clearGeneratedQr = useCallback(() => {
+    setGenerateError(null);
     setUrl((previousUrl) => {
       if (previousUrl) {
         URL.revokeObjectURL(previousUrl);
@@ -164,6 +168,7 @@ export default function Home({ texts, galleryItems }) {
       data = "https://qrart.app/";
     }
     setLoading(true);
+    setGenerateError(null);
     const imageIndex = imgSource === "template" ? templateIndex : null;
 
     const res = await fetch("/api/generate", {
@@ -180,7 +185,9 @@ export default function Home({ texts, galleryItems }) {
     });
 
     if (!res.ok) {
+      const json = await res.json().catch(() => null);
       setLoading(false);
+      setGenerateError(json?.error || texts.generation_error);
       return;
     }
 
@@ -202,7 +209,7 @@ export default function Home({ texts, galleryItems }) {
         code.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 100);
-  }, [input, file, giphyUrl, imgSource, templateIndex]);
+  }, [input, file, giphyUrl, imgSource, templateIndex, texts.generation_error]);
 
   useEffect(() => () => {
     if (url) {
@@ -263,6 +270,7 @@ export default function Home({ texts, galleryItems }) {
                 {generateButtonText}
               </button>
             )}
+            {generateError && <p className="generate-error">{generateError}</p>}
           </section>
 
           {url && (
