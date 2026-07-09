@@ -8,6 +8,7 @@ const sharp = require("sharp");
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 const GIPHY_RANDOM_URL = "https://api.giphy.com/v1/gifs/random";
 const MAX_GIF_FRAMES = 18;
+const GIF_FETCH_TIMEOUT_MS = 8000;
 
 const images = [
   "cat",
@@ -62,7 +63,14 @@ export default async function handler(req, res) {
     } else if (giphyUrl) {
       useGifOutput = true;
       sourceImagePath = path.join(tempDir, "source.gif");
-      await writeRemoteGiphy(giphyUrl, sourceImagePath);
+      try {
+        await writeRemoteGiphy(giphyUrl, sourceImagePath);
+      } catch (e) {
+        console.log(e);
+        useGifOutput = false;
+        sourceImagePath = path.join(tempDir, "source.png");
+        await writeTemplateImage(Math.floor(Math.random() * images.length), sourceImagePath);
+      }
     } else if (index != null) {
       sourceImagePath = path.join(tempDir, "source.png");
       await writeTemplateImage(index, sourceImagePath);
@@ -126,12 +134,12 @@ const writeTemplateImage = async (index, outputPath) => {
 };
 
 const writeRemoteGiphy = async (imageUrl, outputPath) => {
-  const url = new URL(imageUrl);
+  const url = normalizeGiphyImageUrl(imageUrl);
   if (url.protocol !== "https:" || !isGiphyHost(url.hostname)) {
     throw new Error("Invalid GIPHY image URL");
   }
 
-  const imgRes = await fetch(url.toString());
+  const imgRes = await fetchWithTimeout(url.toString(), GIF_FETCH_TIMEOUT_MS);
   if (!imgRes.ok) {
     throw new Error("Failed to fetch GIPHY image");
   }
@@ -140,6 +148,16 @@ const writeRemoteGiphy = async (imageUrl, outputPath) => {
 };
 
 const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
+
+const normalizeGiphyImageUrl = (imageUrl) => {
+  const url = new URL(imageUrl);
+  if (isGiphyHost(url.hostname) && url.pathname.endsWith(".gif")) {
+    const parts = url.pathname.split("/");
+    parts[parts.length - 1] = "200w.gif";
+    url.pathname = parts.join("/");
+  }
+  return url;
+};
 
 const writeRandomGiphy = async (outputPath) => {
   const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
@@ -176,4 +194,14 @@ const writeSquareGif = async (buffer, outputPath) => {
     .resize(512, 512, { fit: "cover" })
     .gif()
     .toFile(outputPath);
+};
+
+const fetchWithTimeout = async (url, timeoutMs) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
 };
