@@ -2,8 +2,6 @@ import fetch from "node-fetch";
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
-const aws = require("aws-sdk");
-const { nanoid } = require("nanoid");
 const { run } = require("qrart-lib");
 const sharp = require("sharp");
 
@@ -24,21 +22,7 @@ const images = [
   "cat3",
 ];
 
-const fileExtension = "jpeg";
-const ENDPOINT = "fra1.digitaloceanspaces.com";
-const BUCKET = "qrart";
-const LOCAL_OUTPUT_DIR = process.env.QRART_LOCAL_OUTPUT_DIR;
 const QR_VERSION = 10;
-
-const spacesEndpoint = new aws.Endpoint(ENDPOINT);
-const s3 = new aws.S3({
-  credentials: {
-    accessKeyId: process.env.SPACES_ACCESS_KEY_ID,
-    secretAccessKey: process.env.SPACES_SECRET_ACCESS_KEY,
-  },
-  region: "us-east-2",
-  endpoint: spacesEndpoint,
-});
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -48,17 +32,20 @@ export default async function handler(req, res) {
   let tempDir = null;
 
   try {
-    const { data, index, file } = req.body;
+    const { data, index, file, giphyUrl } = req.body;
 
     const rndImageIndex =
       index != null ? index : Math.floor(Math.random() * images.length);
     const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
 
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "qrart-site-"));
-    const sourceImagePath = path.join(tempDir, "source.png");
+    const useGifOutput = Boolean(giphyUrl);
+    const sourceImagePath = path.join(tempDir, useGifOutput ? "source.gif" : "source.png");
 
     if (file) {
       await writeDataUrl(file, sourceImagePath);
+    } else if (giphyUrl) {
+      await writeRemoteGiphy(giphyUrl, sourceImagePath);
     } else {
       const imgRes = await fetch(rndImageUrl);
       const buf = Buffer.from(await imgRes.arrayBuffer());
@@ -70,18 +57,17 @@ export default async function handler(req, res) {
       picture: sourceImagePath,
       colorized: true,
       saveDir: tempDir,
-      saveName: "qrcode.png",
+      saveName: useGifOutput ? "qrcode.gif" : "qrcode.png",
     });
 
-    const qr = await sharp(qrName)
-      .toFormat("jpeg", { mozjpeg: true })
-      .toBuffer();
+    if (useGifOutput) {
+      const qr = await fs.readFile(qrName);
+      return res.status(200).json({ url: toDataUrl(qr, "image/gif") });
+    }
 
-    const key = `res/${nanoid(10)}/qrcode.${fileExtension}`;
+    const qr = await sharp(qrName).toFormat("jpeg", { mozjpeg: true }).toBuffer();
 
-    const url = await publishQr(key, qr);
-
-    res.status(200).json({ url });
+    res.status(200).json({ url: toDataUrl(qr, "image/jpeg") });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: "Internal server error!" });
@@ -100,22 +86,20 @@ const writeDataUrl = async (dataUrl, outputPath) => {
   await fs.writeFile(outputPath, Buffer.from(base64, "base64"));
 };
 
-const publishQr = async (key, qr) => {
-  if (LOCAL_OUTPUT_DIR) {
-    const outputPath = path.join(process.cwd(), LOCAL_OUTPUT_DIR, key);
-    await fs.mkdir(path.dirname(outputPath), { recursive: true });
-    await fs.writeFile(outputPath, qr);
-    return `/${key}`;
+const writeRemoteGiphy = async (imageUrl, outputPath) => {
+  const url = new URL(imageUrl);
+  if (url.protocol !== "https:" || !isGiphyHost(url.hostname)) {
+    throw new Error("Invalid GIPHY image URL");
   }
 
-  await s3
-    .putObject({
-      Body: qr,
-      Bucket: BUCKET,
-      Key: key,
-      ACL: "public-read",
-    })
-    .promise();
-
-  return `https://${BUCKET}.${ENDPOINT}/${key}`;
+  const imgRes = await fetch(url.toString());
+  if (!imgRes.ok) {
+    throw new Error("Failed to fetch GIPHY image");
+  }
+  const buf = Buffer.from(await imgRes.arrayBuffer());
+  await fs.writeFile(outputPath, buf);
 };
+
+const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
+
+const toDataUrl = (buffer, mimeType) => `data:${mimeType};base64,${buffer.toString("base64")}`;

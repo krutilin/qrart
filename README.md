@@ -2,10 +2,10 @@
 
 QR to art processing app
 
-Local QR generation without Spaces credentials:
+Run locally:
 
 ```sh
-QRART_LOCAL_OUTPUT_DIR=public npm run dev
+npm run dev
 ```
 
 MVP TODO
