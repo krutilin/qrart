@@ -266,7 +266,6 @@ export default function Home({ texts, galleryItems }) {
 
   useEffect(() => {
     if (!loading) {
-      setLoadingPhraseIndex(0);
       return undefined;
     }
 
@@ -284,6 +283,7 @@ export default function Home({ texts, galleryItems }) {
     if (!data) {
       data = "https://qrart.app/";
     }
+    setLoadingPhraseIndex(0);
     setLoading(true);
     setGenerateError(null);
     const imageIndex = imgSource === "template" ? templateIndex : null;
