@@ -21,9 +21,11 @@ const texts = {
     h3_topic_idea: "Idea",
     p_topic_idea: "",
     h3_topic_share: "Share",
-    h3_topic_email: "Have a question",
-    p_topic_email: "Found a bug, need a feature. Just drop us a letter ",
-    p_topic_telegram: "You can also message me on Telegram ",
+    h3_topic_email: "Questions?",
+    p_topic_telegram: "Message me on Telegram ",
+    h3_topic_library: "Can I use it as a library?",
+    p_topic_library:
+      "Yes. The generator is powered by qrart-lib, which you can use in your own Node.js project to generate QR art programmatically: static images, templates, and animated GIFs.",
     select_image: "Select image",
     loading: "Loading ...",
     button_random: "Random",
@@ -51,9 +53,11 @@ const texts = {
     h3_topic_idea: "Идея",
     p_topic_idea: "Идея",
     h3_topic_share: "Расшарь в сеточки",
-    h3_topic_email: "Есть вопросы",
-    p_topic_email: "Нашли баг, нужна фича. Ждем письмо на ",
-    p_topic_telegram: "Еще можно написать мне в тележку ",
+    h3_topic_email: "Есть вопросы?",
+    p_topic_telegram: "Пиши в тележку ",
+    h3_topic_library: "Можно использовать как библиотеку?",
+    p_topic_library:
+      "Да. Генератор основан на qrart-lib, ее можно поставить в свой Node.js-проект и генерировать QR-арт программно: статичные картинки, шаблоны и анимированные GIF.",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     button_random: "Рандом",
@@ -283,10 +287,6 @@ export default function Home({ texts, galleryItems }) {
               {texts.h3_topic_email}
             </h3>
             <p>
-              {texts.p_topic_email}{" "}
-              <a href="mailto:support@qrart.app">support@qrart.app</a>
-            </p>
-            <p>
               {texts.p_topic_telegram}{" "}
               <a
                 href="https://t.me/ykrutilin/"
@@ -296,6 +296,12 @@ export default function Home({ texts, galleryItems }) {
                 @ykrutilin
               </a>
             </p>
+
+            <h3 id="library">
+              <a href="#library">#</a>
+              {texts.h3_topic_library}
+            </h3>
+            <p>{texts.p_topic_library}</p>
           </section>
         </div>
         <Footer />
