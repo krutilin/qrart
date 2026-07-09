@@ -45,7 +45,7 @@ export default async function handler(req, res) {
   let tempDir = null;
 
   try {
-    const { data, index, file, giphyId, giphyUrl } = req.body;
+    const { data, index, file, giphyId, giphyUrl, giphyUrls } = req.body;
 
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "qrart-site-"));
     let useGifOutput = false;
@@ -60,10 +60,10 @@ export default async function handler(req, res) {
       } else {
         await fs.writeFile(sourceImagePath, buffer);
       }
-    } else if (giphyId || giphyUrl) {
+    } else if (giphyId || giphyUrl || giphyUrls?.length) {
       useGifOutput = true;
       sourceImagePath = path.join(tempDir, "source.gif");
-      await writeGiphySource({ giphyId, giphyUrl }, sourceImagePath);
+      await writeGiphySource({ giphyId, giphyUrl, giphyUrls }, sourceImagePath);
     } else if (index != null) {
       sourceImagePath = path.join(tempDir, "source.png");
       await writeTemplateImage(index, sourceImagePath);
@@ -158,7 +158,13 @@ const writeRemoteGiphy = async (imageUrl, outputPath, { normalize = true } = {})
 
 const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
 
-const writeGiphySource = async ({ giphyId, giphyUrl }, outputPath) => {
+const writeGiphySource = async ({ giphyId, giphyUrl, giphyUrls }, outputPath) => {
+  const urls = Array.isArray(giphyUrls) ? giphyUrls.slice(0, 5) : [];
+  if (urls.length) {
+    await writeFirstWorkingGiphy(urls, outputPath);
+    return;
+  }
+
   const id = giphyId || extractGiphyId(giphyUrl);
   if (!id) {
     await writeRemoteGiphy(giphyUrl, outputPath);

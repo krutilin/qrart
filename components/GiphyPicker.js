@@ -3,6 +3,14 @@ import { GiphyFetch } from "@giphy/js-fetch-api";
 
 const defaultQuery = "pixel";
 
+const getGiphyImageUrls = (gif) => [
+  gif.images?.fixed_width?.url,
+  gif.images?.fixed_height?.url,
+  gif.images?.downsized?.url,
+  gif.images?.downsized_medium?.url,
+  gif.images?.original?.url,
+].filter(Boolean);
+
 const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
   const [query, setQuery] = useState(defaultQuery);
   const [gifs, setGifs] = useState([]);
@@ -36,6 +44,7 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
         title: gif.title,
         previewUrl: gif.images?.fixed_width_small?.url || gif.images?.downsized?.url,
         url: gif.images?.fixed_width?.url || gif.images?.downsized?.url || gif.images?.original?.url,
+        urls: getGiphyImageUrls(gif),
       })).filter((gif) => gif.previewUrl && gif.url);
       setGifs(nextGifs);
       if (nextGifs[0]) {
