@@ -132,7 +132,9 @@ footer {
     object-fit: cover;
 }
 
-.giphy-error {
+.giphy-error,
+.giphy-empty,
+.upload-error {
     color: #e76e55;
 }
 

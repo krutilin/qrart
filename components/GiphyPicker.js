@@ -17,21 +17,31 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
   const [selectedUrl, setSelectedUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const giphy = useMemo(() => (apiKey ? new GiphyFetch(apiKey) : null), [apiKey]);
 
   const search = useCallback(async (searchQuery) => {
     const normalizedQuery = searchQuery.trim();
     if (!giphy) {
+      setSelectedUrl(null);
+      setGifs([]);
+      onGifChange(null);
+      setHasSearched(true);
       setError(texts.giphy_missing_key);
       return;
     }
     if (!normalizedQuery) {
+      setSelectedUrl(null);
       setGifs([]);
+      onGifChange(null);
+      setHasSearched(false);
+      setError(null);
       return;
     }
 
     setLoading(true);
     setError(null);
+    setHasSearched(false);
 
     try {
       const result = await giphy.search(normalizedQuery, {
@@ -46,14 +56,21 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
         url: gif.images?.fixed_width?.url || gif.images?.downsized?.url || gif.images?.original?.url,
         urls: getGiphyImageUrls(gif),
       })).filter((gif) => gif.previewUrl && gif.url);
+      setHasSearched(true);
       setGifs(nextGifs);
       if (nextGifs[0]) {
         setSelectedUrl(nextGifs[0].url);
         onGifChange(nextGifs[0]);
+      } else {
+        setSelectedUrl(null);
+        onGifChange(null);
       }
     } catch (e) {
       setError(e.message);
       setGifs([]);
+      setSelectedUrl(null);
+      onGifChange(null);
+      setHasSearched(true);
     } finally {
       setLoading(false);
     }
@@ -97,6 +114,9 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
       </form>
 
       {error && <p className="giphy-error">{error}</p>}
+      {hasSearched && !loading && !error && query.trim() && gifs.length === 0 && (
+        <p className="giphy-empty">{texts.giphy_no_results}</p>
+      )}
 
       {selectedUrl && (
         <div className="media-selected">

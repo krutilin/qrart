@@ -3,10 +3,10 @@ import { useDropzone } from "react-dropzone";
 
 const canvasSize = 512;
 
-const Dropzone = ({ message, onFileChange }) => {
+const Dropzone = ({ message, errorMessage, onFileChange }) => {
   const [preview, setPreview] = useState(null);
 
-  const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
+  const { acceptedFiles, fileRejections, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 20000000,
     accept: "image/gif, image/jpeg, image/png",
@@ -71,6 +71,7 @@ const Dropzone = ({ message, onFileChange }) => {
           <img src={preview} alt="Upload preview" />
         </div>
       )}
+      {fileRejections.length > 0 && <p className="upload-error">{errorMessage}</p>}
     </div>
   );
 };
