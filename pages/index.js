@@ -31,6 +31,14 @@ const texts = {
     p_topic_giphy: "GIF search and random GIFs are powered by GIPHY.",
     select_image: "Select image",
     loading: "Loading ...",
+    loading_phrases: [
+      "Brewing pixels",
+      "Mashing QR hops",
+      "Stirring GIF foam",
+      "Went for a snack",
+      "Still cooking frames",
+      "Almost animated",
+    ],
     button_random: "Random",
     button_template: "Template",
     button_upload: "Upload",
@@ -67,6 +75,14 @@ const texts = {
     p_topic_giphy: "Поиск GIF и рандомные GIF работают на GIPHY.",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
+    loading_phrases: [
+      "Варю пиво",
+      "Делаю затор",
+      "Мешаю пиксели",
+      "Отошел покушать",
+      "Грею кадры",
+      "Почти оживил",
+    ],
     button_random: "Рандом",
     button_template: "По шаблону",
     button_upload: "Своя",
@@ -126,6 +142,7 @@ export default function Home({ texts, galleryItems }) {
   const [url, setUrl] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const [downloadName, setDownloadName] = useState("qrcode.gif");
+  const [loadingPhraseIndex, setLoadingPhraseIndex] = useState(0);
   const onGiphyChange = useCallback((nextGif) => {
     setGiphy(nextGif);
   }, []);
@@ -163,6 +180,21 @@ export default function Home({ texts, galleryItems }) {
     (imgSource !== "giphy" || Boolean(giphy?.urls?.length || giphy?.id)) &&
     (imgSource !== "upload" || Boolean(file));
   const generateButtonText = imgSource === "giphy" ? texts.button_gif : texts.button;
+  const loadingPhrases = texts.loading_phrases || [texts.loading];
+  const loadingButtonText = loadingPhrases[loadingPhraseIndex % loadingPhrases.length];
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingPhraseIndex(0);
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      setLoadingPhraseIndex((index) => index + 1);
+    }, 2200);
+
+    return () => clearInterval(timer);
+  }, [loading]);
 
   // generate
   const sendData = useCallback(async () => {
@@ -263,9 +295,13 @@ export default function Home({ texts, galleryItems }) {
               />
             )}
             {loading ? (
-              <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
-                <span className="is-error">{texts.loading}</span>
-              </div>
+              <button
+                className="nes-btn is-error loading-button animate__animated animate__pulse animate__infinite"
+                disabled
+                type="button"
+              >
+                {loadingButtonText}
+              </button>
             ) : (
               <button
                 className="nes-btn is-primary"

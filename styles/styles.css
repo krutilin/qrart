@@ -141,6 +141,11 @@ footer {
     margin-top: 16px;
 }
 
+.loading-button {
+    min-width: 220px;
+    margin-top: 8px;
+}
+
 .giphy-attribution {
     display: inline-block;
     margin-top: 12px;
