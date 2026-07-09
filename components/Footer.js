@@ -3,7 +3,7 @@ import React from "react";
 const Footer = () => {
   return (
     <footer>
-      <span>©2021</span>{" "}
+      <span>©2026</span>{" "}
       <a
         href="https://github.com/alexslavr"
         target="_blank"

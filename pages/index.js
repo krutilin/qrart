@@ -23,6 +23,7 @@ const texts = {
     h3_topic_share: "Share",
     h3_topic_email: "Have a question",
     p_topic_email: "Found a bug, need a feature. Just drop us a letter ",
+    p_topic_telegram: "You can also message me on Telegram ",
     select_image: "Select image",
     loading: "Loading ...",
     button_random: "Random",
@@ -52,6 +53,7 @@ const texts = {
     h3_topic_share: "Расшарь в сеточки",
     h3_topic_email: "Есть вопросы",
     p_topic_email: "Нашли баг, нужна фича. Ждем письмо на ",
+    p_topic_telegram: "Еще можно написать мне в тележку ",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     button_random: "Рандом",
@@ -283,6 +285,16 @@ export default function Home({ texts, galleryItems }) {
             <p>
               {texts.p_topic_email}{" "}
               <a href="mailto:support@qrart.app">support@qrart.app</a>
+            </p>
+            <p>
+              {texts.p_topic_telegram}{" "}
+              <a
+                href="https://t.me/ykrutilin/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                @ykrutilin
+              </a>
             </p>
           </section>
         </div>
