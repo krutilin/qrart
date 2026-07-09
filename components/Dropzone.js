@@ -1,38 +1,57 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
 const canvasSize = 512;
 
 const Dropzone = ({ message, onFileChange }) => {
-  const canvas = useRef(null);
-  const [showCanvas, setShowCanvas] = useState(false);
+  const [preview, setPreview] = useState(null);
 
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     maxSize: 20000000,
-    accept: "image/jpeg, image/png",
+    accept: "image/gif, image/jpeg, image/png",
   });
 
   const file = acceptedFiles?.[0];
 
-  const reader = new FileReader();
-  reader.onloadend = (event) => {
-    setShowCanvas(true);
-    const ctx = canvas.current.getContext("2d");
-
-    const img = new Image();
-    img.src = event.target.result;
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvasSize, canvasSize);
-      onFileChange(canvas.current.toDataURL());
-    };
-  };
-
   useEffect(() => {
+    let cancelled = false;
+
     if (file) {
+      const reader = new FileReader();
+      reader.onloadend = (event) => {
+        if (cancelled) return;
+
+        const dataUrl = event.target.result;
+        if (file.type === "image/gif") {
+          setPreview(dataUrl);
+          onFileChange(dataUrl);
+          return;
+        }
+
+        const img = new Image();
+        img.src = dataUrl;
+        img.onload = () => {
+          if (cancelled) return;
+          const offscreenCanvas = document.createElement("canvas");
+          offscreenCanvas.width = canvasSize;
+          offscreenCanvas.height = canvasSize;
+          const ctx = offscreenCanvas.getContext("2d");
+          ctx.clearRect(0, 0, canvasSize, canvasSize);
+          ctx.drawImage(img, 0, 0, canvasSize, canvasSize);
+          const squareDataUrl = offscreenCanvas.toDataURL();
+          setPreview(squareDataUrl);
+          onFileChange(squareDataUrl);
+        };
+      };
       reader.readAsDataURL(file);
     }
-    return () => onFileChange(null);
+
+    return () => {
+      cancelled = true;
+      setPreview(null);
+      onFileChange(null);
+    };
   }, [file, onFileChange]);
 
   return (
@@ -47,9 +66,9 @@ const Dropzone = ({ message, onFileChange }) => {
         <p>{message}</p>
       </div>
 
-      {showCanvas && (
+      {preview && (
         <div className="preview">
-          <canvas ref={canvas} width={512} height={512} />
+          <img src={preview} alt="Upload preview" />
         </div>
       )}
     </div>

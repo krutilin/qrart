@@ -6,6 +6,8 @@ const { run } = require("qrart-lib");
 const sharp = require("sharp");
 
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
+const GIPHY_RANDOM_URL = "https://api.giphy.com/v1/gifs/random";
+const MAX_GIF_FRAMES = 18;
 
 const images = [
   "cat",
@@ -24,6 +26,16 @@ const images = [
 
 const QR_VERSION = 10;
 
+export const config = {
+  maxDuration: 30,
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb",
+    },
+    responseLimit: false,
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -34,22 +46,32 @@ export default async function handler(req, res) {
   try {
     const { data, index, file, giphyUrl } = req.body;
 
-    const rndImageIndex =
-      index != null ? index : Math.floor(Math.random() * images.length);
-    const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
-
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "qrart-site-"));
-    const useGifOutput = Boolean(giphyUrl);
-    const sourceImagePath = path.join(tempDir, useGifOutput ? "source.gif" : "source.png");
+    let useGifOutput = false;
+    let sourceImagePath = null;
 
     if (file) {
-      await writeDataUrl(file, sourceImagePath);
+      const { buffer, mimeType } = parseDataUrl(file);
+      useGifOutput = mimeType === "image/gif";
+      sourceImagePath = path.join(tempDir, useGifOutput ? "source.gif" : "source.png");
+      if (useGifOutput) {
+        await writeSquareGif(buffer, sourceImagePath);
+      } else {
+        await fs.writeFile(sourceImagePath, buffer);
+      }
     } else if (giphyUrl) {
+      useGifOutput = true;
+      sourceImagePath = path.join(tempDir, "source.gif");
       await writeRemoteGiphy(giphyUrl, sourceImagePath);
+    } else if (index != null) {
+      sourceImagePath = path.join(tempDir, "source.png");
+      await writeTemplateImage(index, sourceImagePath);
     } else {
-      const imgRes = await fetch(rndImageUrl);
-      const buf = Buffer.from(await imgRes.arrayBuffer());
-      await fs.writeFile(sourceImagePath, buf);
+      useGifOutput = await writeRandomGiphy(path.join(tempDir, "source.gif"));
+      sourceImagePath = path.join(tempDir, useGifOutput ? "source.gif" : "source.png");
+      if (!useGifOutput) {
+        await writeTemplateImage(Math.floor(Math.random() * images.length), sourceImagePath);
+      }
     }
 
     const { qrName } = await run(data, {
@@ -62,12 +84,16 @@ export default async function handler(req, res) {
 
     if (useGifOutput) {
       const qr = await fs.readFile(qrName);
-      return res.status(200).json({ url: toDataUrl(qr, "image/gif") });
+      res.setHeader("Content-Type", "image/gif");
+      res.setHeader("Cache-Control", "no-store");
+      return res.status(200).send(qr);
     }
 
     const qr = await sharp(qrName).toFormat("jpeg", { mozjpeg: true }).toBuffer();
 
-    res.status(200).json({ url: toDataUrl(qr, "image/jpeg") });
+    res.setHeader("Content-Type", "image/jpeg");
+    res.setHeader("Cache-Control", "no-store");
+    res.status(200).send(qr);
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: "Internal server error!" });
@@ -78,12 +104,25 @@ export default async function handler(req, res) {
   }
 }
 
-const writeDataUrl = async (dataUrl, outputPath) => {
-  const [, base64] = dataUrl.match(/^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/) ?? [];
+const parseDataUrl = (dataUrl) => {
+  const [, , mimeType, base64] = dataUrl.match(/^(data:)?(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/) ?? [];
   if (!base64) {
     throw new Error("Invalid image payload");
   }
-  await fs.writeFile(outputPath, Buffer.from(base64, "base64"));
+  return {
+    buffer: Buffer.from(base64, "base64"),
+    mimeType,
+  };
+};
+
+const writeTemplateImage = async (index, outputPath) => {
+  const imageIndex = Number.isInteger(index) && index >= 0 && index < images.length ? index : 0;
+  const imgRes = await fetch(`${cdn_url}${images[imageIndex]}.png`);
+  if (!imgRes.ok) {
+    throw new Error("Failed to fetch template image");
+  }
+  const buf = Buffer.from(await imgRes.arrayBuffer());
+  await fs.writeFile(outputPath, buf);
 };
 
 const writeRemoteGiphy = async (imageUrl, outputPath) => {
@@ -97,9 +136,44 @@ const writeRemoteGiphy = async (imageUrl, outputPath) => {
     throw new Error("Failed to fetch GIPHY image");
   }
   const buf = Buffer.from(await imgRes.arrayBuffer());
-  await fs.writeFile(outputPath, buf);
+  await writeSquareGif(buf, outputPath);
 };
 
 const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
 
-const toDataUrl = (buffer, mimeType) => `data:${mimeType};base64,${buffer.toString("base64")}`;
+const writeRandomGiphy = async (outputPath) => {
+  const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
+  if (!apiKey) {
+    return false;
+  }
+
+  try {
+    const url = new URL(GIPHY_RANDOM_URL);
+    url.searchParams.set("api_key", apiKey);
+    url.searchParams.set("tag", "pixel");
+    url.searchParams.set("rating", "g");
+
+    const giphyRes = await fetch(url.toString());
+    const json = await giphyRes.json();
+    const imageUrl =
+      json.data?.images?.fixed_width?.url ||
+      json.data?.images?.downsized?.url ||
+      json.data?.images?.original?.url;
+    if (!giphyRes.ok || !imageUrl) {
+      return false;
+    }
+
+    await writeRemoteGiphy(imageUrl, outputPath);
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
+const writeSquareGif = async (buffer, outputPath) => {
+  await sharp(buffer, { animated: true, pages: MAX_GIF_FRAMES })
+    .resize(512, 512, { fit: "cover" })
+    .gif()
+    .toFile(outputPath);
+};

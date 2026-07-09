@@ -2,6 +2,13 @@
     margin-top: 2rem;
 }
 
+.hero-panel {
+    border: 4px solid #212529;
+    padding: 1.5rem;
+    background: #ffffff;
+    box-shadow: 8px 8px 0 #212529;
+}
+
 .section input {
     margin-bottom: 1rem;
 }
@@ -47,6 +54,11 @@ h4 {
     font-size: 13px;
 }
 
+.hero-panel label {
+    display: inline-block;
+    margin: 0 12px 14px 0;
+}
+
 footer {
     margin-top: 3rem;
 }
@@ -55,23 +67,83 @@ footer {
     margin-top: 14px;
 }
 
-.img-gallery {
-    margin-bottom: 16px;
-}
-
 .dropzone {
     margin-bottom: 16px!important;
 }
 
-.preview canvas {
+.preview img {
     max-width: 100%;
 }
 
-@media only screen and (min-width: 577px) {
-    .img-gallery {
-        max-width: 50%;
-        margin: 0 auto 16px auto;
-    }
+.giphy-picker {
+    margin-bottom: 16px;
+}
+
+.giphy-search {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.giphy-search input {
+    margin-bottom: 0;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 12px;
+}
+
+.media-selected {
+    aspect-ratio: 1 / 1;
+    border: 4px solid #212529;
+    margin: 0 auto 16px;
+    max-width: 260px;
+    overflow: hidden;
+    background: #000;
+}
+
+.media-selected img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.media-item {
+    aspect-ratio: 1 / 1;
+    border: 4px solid #212529;
+    background: white;
+    cursor: pointer;
+    padding: 0;
+    image-rendering: pixelated;
+}
+
+.media-item.is-selected {
+    border-color: #209cee;
+    box-shadow: 0 0 0 4px #92cc41;
+}
+
+.media-item img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.giphy-error {
+    color: #e76e55;
+}
+
+.giphy-attribution {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 12px;
+}
+
+.template-picker {
+    margin-bottom: 16px;
 }
 
 @media only screen and (max-width: 576px) {
@@ -82,5 +154,14 @@ footer {
     footer {
         font-size: 9px;
         margin-top: 2rem;
+    }
+
+    .giphy-search {
+        flex-direction: column;
+    }
+
+    .hero-panel {
+        padding: 1rem;
+        box-shadow: 4px 4px 0 #212529;
     }
 }
