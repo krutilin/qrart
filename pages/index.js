@@ -25,8 +25,7 @@ const texts = {
     p_topic_telegram: "Message me on Telegram ",
     h3_topic_library: "Can I use it as a library?",
     p_topic_library_start: "Yes. The generator is powered by ",
-    p_topic_library_end:
-      ", which you can use in your own Node.js project to generate QR art programmatically: static images, templates, and animated GIFs.",
+    p_topic_library_end: ".",
     select_image: "Select image",
     loading: "Loading ...",
     button_random: "Random",
@@ -58,8 +57,7 @@ const texts = {
     p_topic_telegram: "Пиши в тележку ",
     h3_topic_library: "Можно использовать как библиотеку?",
     p_topic_library_start: "Да. Генератор основан на ",
-    p_topic_library_end:
-      ", ее можно поставить в свой Node.js-проект и генерировать QR-арт программно: статичные картинки, шаблоны и анимированные GIF.",
+    p_topic_library_end: ".",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     button_random: "Рандом",
