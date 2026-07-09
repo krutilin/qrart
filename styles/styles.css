@@ -144,7 +144,15 @@ footer {
 .giphy-attribution {
     display: inline-block;
     margin-top: 12px;
-    font-size: 12px;
+    line-height: 0;
+}
+
+.giphy-attribution img {
+    display: block;
+    width: 200px;
+    max-width: 100%;
+    height: auto;
+    image-rendering: auto;
 }
 
 .template-picker {

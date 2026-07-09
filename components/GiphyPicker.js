@@ -118,10 +118,6 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
         ))}
       </div>
 
-      <a className="giphy-attribution" href="https://giphy.com/" target="_blank" rel="noreferrer">
-        Powered by GIPHY
-      </a>
-
       {loading && (
         <div className="loader nes-badge animate__animated animate__pulse animate__infinite">
           <span className="is-warning">{texts.loading}</span>

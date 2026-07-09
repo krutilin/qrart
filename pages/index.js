@@ -27,6 +27,8 @@ const texts = {
     h3_topic_library: "Can I use it as a library?",
     p_topic_library_start: "Yes. The generator is powered by ",
     p_topic_library_end: ".",
+    h3_topic_giphy: "Where do GIFs come from?",
+    p_topic_giphy: "GIF search and random GIFs are powered by GIPHY.",
     select_image: "Select image",
     loading: "Loading ...",
     button_random: "Random",
@@ -61,6 +63,8 @@ const texts = {
     h3_topic_library: "Можно использовать как библиотеку?",
     p_topic_library_start: "Да. Генератор основан на ",
     p_topic_library_end: ".",
+    h3_topic_giphy: "Откуда берутся GIF?",
+    p_topic_giphy: "Поиск GIF и рандомные GIF работают на GIPHY.",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     button_random: "Рандом",
@@ -324,6 +328,21 @@ export default function Home({ texts, galleryItems }) {
               </a>
               {texts.p_topic_library_end}
             </p>
+
+            <h3 id="giphy">
+              <a href="#giphy">#</a>
+              {texts.h3_topic_giphy}
+            </h3>
+            <p>{texts.p_topic_giphy}</p>
+            <a
+              className="giphy-attribution"
+              href="https://giphy.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Powered by GIPHY"
+            >
+              <img src="/giphy/powered-by-giphy.gif" alt="Powered by GIPHY" />
+            </a>
           </section>
         </div>
         <Footer />
