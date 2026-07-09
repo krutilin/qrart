@@ -16,7 +16,8 @@ const texts = {
     p: "Turn any link into a moving QR code with GIF energy.",
     h3_title: "Make it move",
     h4: "Paste URL or text",
-    button: "Make animated QR",
+    button: "Make QR",
+    button_gif: "Make QR GIF",
     qr: "Your animated QR",
     h3_topic_idea: "Idea",
     p_topic_idea: "",
@@ -43,13 +44,14 @@ const texts = {
   ru: {
     title: "QRcode пиксель ART генератор",
     description:
-      "Делай анимированные QR-гивки из GIPHY и своих ссылок.",
-    h1: "Анимированные QR-гивки",
+      "Делай анимированные QR-гифки из GIPHY и своих ссылок.",
+    h1: "Анимированные QR-гифки",
     p: "Преврати любую ссылку в живой QR-код на GIF-фоне.",
     h3_title: "Сделай QR живым",
     h4: "Вставь URL или текст",
-    button: "Сделать QR-гивку",
-    qr: "Твоя QR-гивка",
+    button: "Сделать QR",
+    button_gif: "Сделать QR-гифку",
+    qr: "Твоя QR-гифка",
     h3_topic_idea: "Идея",
     p_topic_idea: "Идея",
     h3_topic_share: "Расшарь в сеточки",
@@ -152,6 +154,7 @@ export default function Home({ texts, galleryItems }) {
   const canGenerate =
     (imgSource !== "giphy" || Boolean(giphyUrl)) &&
     (imgSource !== "upload" || Boolean(file));
+  const generateButtonText = imgSource === "giphy" ? texts.button_gif : texts.button;
 
   // generate
   const sendData = useCallback(async () => {
@@ -257,7 +260,7 @@ export default function Home({ texts, galleryItems }) {
                 disabled={!canGenerate}
                 onClick={sendData}
               >
-                {texts.button}
+                {generateButtonText}
               </button>
             )}
           </section>
