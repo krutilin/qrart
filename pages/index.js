@@ -24,8 +24,9 @@ const texts = {
     h3_topic_email: "Questions?",
     p_topic_telegram: "Message me on Telegram ",
     h3_topic_library: "Can I use it as a library?",
-    p_topic_library:
-      "Yes. The generator is powered by qrart-lib, which you can use in your own Node.js project to generate QR art programmatically: static images, templates, and animated GIFs.",
+    p_topic_library_start: "Yes. The generator is powered by ",
+    p_topic_library_end:
+      ", which you can use in your own Node.js project to generate QR art programmatically: static images, templates, and animated GIFs.",
     select_image: "Select image",
     loading: "Loading ...",
     button_random: "Random",
@@ -56,8 +57,9 @@ const texts = {
     h3_topic_email: "Есть вопросы?",
     p_topic_telegram: "Пиши в тележку ",
     h3_topic_library: "Можно использовать как библиотеку?",
-    p_topic_library:
-      "Да. Генератор основан на qrart-lib, ее можно поставить в свой Node.js-проект и генерировать QR-арт программно: статичные картинки, шаблоны и анимированные GIF.",
+    p_topic_library_start: "Да. Генератор основан на ",
+    p_topic_library_end:
+      ", ее можно поставить в свой Node.js-проект и генерировать QR-арт программно: статичные картинки, шаблоны и анимированные GIF.",
     select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     button_random: "Рандом",
@@ -301,7 +303,17 @@ export default function Home({ texts, galleryItems }) {
               <a href="#library">#</a>
               {texts.h3_topic_library}
             </h3>
-            <p>{texts.p_topic_library}</p>
+            <p>
+              {texts.p_topic_library_start}
+              <a
+                href="https://github.com/krutilin/qrart-lib#readme"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                qrart-lib
+              </a>
+              {texts.p_topic_library_end}
+            </p>
           </section>
         </div>
         <Footer />
