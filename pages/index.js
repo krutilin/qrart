@@ -117,13 +117,13 @@ export default function Home({ texts, galleryItems }) {
 
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
-  const [giphyUrl, setGiphyUrl] = useState(null);
+  const [giphyId, setGiphyId] = useState(null);
   const [templateIndex, setTemplateIndex] = useState(0);
   const [url, setUrl] = useState(null);
   const [generateError, setGenerateError] = useState(null);
   const [downloadName, setDownloadName] = useState("qrcode.gif");
-  const onGiphyChange = useCallback((nextGiphyUrl) => {
-    setGiphyUrl(nextGiphyUrl);
+  const onGiphyChange = useCallback((nextGif) => {
+    setGiphyId(nextGif?.id || null);
   }, []);
   const clearGeneratedQr = useCallback(() => {
     setGenerateError(null);
@@ -156,7 +156,7 @@ export default function Home({ texts, galleryItems }) {
     [clearGeneratedQr]
   );
   const canGenerate =
-    (imgSource !== "giphy" || Boolean(giphyUrl)) &&
+    (imgSource !== "giphy" || Boolean(giphyId)) &&
     (imgSource !== "upload" || Boolean(file));
   const generateButtonText = imgSource === "giphy" ? texts.button_gif : texts.button;
 
@@ -180,7 +180,7 @@ export default function Home({ texts, galleryItems }) {
         data,
         index: imageIndex,
         file: imgSource === "upload" ? file : null,
-        giphyUrl: imgSource === "giphy" ? giphyUrl : null,
+        giphyId: imgSource === "giphy" ? giphyId : null,
       }),
     });
 
@@ -209,7 +209,7 @@ export default function Home({ texts, galleryItems }) {
         code.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 100);
-  }, [input, file, giphyUrl, imgSource, templateIndex, texts.generation_error]);
+  }, [input, file, giphyId, imgSource, templateIndex, texts.generation_error]);
 
   useEffect(() => () => {
     if (url) {

@@ -40,7 +40,7 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
       setGifs(nextGifs);
       if (nextGifs[0]) {
         setSelectedUrl(nextGifs[0].url);
-        onGifChange(nextGifs[0].url);
+        onGifChange(nextGifs[0]);
       }
     } catch (e) {
       setError(e.message);
@@ -57,7 +57,7 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
   const selectGif = useCallback(
     (gif) => {
       setSelectedUrl(gif.url);
-      onGifChange(gif.url);
+      onGifChange(gif);
     },
     [onGifChange]
   );

@@ -6,6 +6,7 @@ const { run } = require("qrart-lib");
 const sharp = require("sharp");
 
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
+const GIPHY_BY_ID_URL = "https://api.giphy.com/v1/gifs/";
 const GIPHY_RANDOM_URL = "https://api.giphy.com/v1/gifs/random";
 const MAX_GIF_FRAMES = 18;
 const GIF_FETCH_TIMEOUT_MS = 8000;
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
   let tempDir = null;
 
   try {
-    const { data, index, file, giphyUrl } = req.body;
+    const { data, index, file, giphyId, giphyUrl } = req.body;
 
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "qrart-site-"));
     let useGifOutput = false;
@@ -60,10 +61,10 @@ export default async function handler(req, res) {
       } else {
         await fs.writeFile(sourceImagePath, buffer);
       }
-    } else if (giphyUrl) {
+    } else if (giphyId || giphyUrl) {
       useGifOutput = true;
       sourceImagePath = path.join(tempDir, "source.gif");
-      await writeRemoteGiphy(giphyUrl, sourceImagePath);
+      await writeGiphySource({ giphyId, giphyUrl }, sourceImagePath);
     } else if (index != null) {
       sourceImagePath = path.join(tempDir, "source.png");
       await writeTemplateImage(index, sourceImagePath);
@@ -126,10 +127,10 @@ const writeTemplateImage = async (index, outputPath) => {
   await fs.writeFile(outputPath, buf);
 };
 
-const writeRemoteGiphy = async (imageUrl, outputPath) => {
+const writeRemoteGiphy = async (imageUrl, outputPath, { normalize = true } = {}) => {
   let url;
   try {
-    url = normalizeGiphyImageUrl(imageUrl);
+    url = normalize ? normalizeGiphyImageUrl(imageUrl) : new URL(imageUrl);
   } catch (e) {
     throw new PublicApiError(400, "Invalid GIPHY image URL");
   }
@@ -158,6 +159,69 @@ const writeRemoteGiphy = async (imageUrl, outputPath) => {
 
 const isGiphyHost = (hostname) => hostname === "giphy.com" || hostname.endsWith(".giphy.com");
 
+const writeGiphySource = async ({ giphyId, giphyUrl }, outputPath) => {
+  const id = giphyId || extractGiphyId(giphyUrl);
+  if (!id) {
+    await writeRemoteGiphy(giphyUrl, outputPath);
+    return;
+  }
+
+  const gif = await fetchGiphyById(id);
+  await writeFirstWorkingGiphy(getGiphyImageCandidates(gif), outputPath);
+};
+
+const fetchGiphyById = async (id) => {
+  const apiKey = process.env.NEXT_PUBLIC_GIPHY_API_KEY;
+  if (!apiKey) {
+    throw new PublicApiError(503, "GIF search is not configured.");
+  }
+
+  const url = new URL(id, GIPHY_BY_ID_URL);
+  url.searchParams.set("api_key", apiKey);
+
+  const giphyRes = await fetchWithTimeout(url.toString(), GIF_FETCH_TIMEOUT_MS);
+  const json = await giphyRes.json();
+  if (!giphyRes.ok || !json.data?.images) {
+    throw new PublicApiError(422, "Could not load this GIF. Try another one.");
+  }
+  return json.data;
+};
+
+const getGiphyImageCandidates = (gif) => [
+  gif.images?.fixed_width?.url,
+  gif.images?.fixed_height?.url,
+  gif.images?.downsized?.url,
+  gif.images?.downsized_medium?.url,
+  gif.images?.original?.url,
+].filter(Boolean);
+
+const writeFirstWorkingGiphy = async (imageUrls, outputPath) => {
+  const errors = [];
+  for (const imageUrl of imageUrls) {
+    try {
+      await writeRemoteGiphy(imageUrl, outputPath, { normalize: false });
+      return;
+    } catch (e) {
+      errors.push(e.message);
+    }
+  }
+
+  throw new PublicApiError(422, "Could not process this GIF. Try another one.");
+};
+
+const extractGiphyId = (imageUrl) => {
+  if (!imageUrl) return null;
+  try {
+    const url = new URL(imageUrl);
+    if (!isGiphyHost(url.hostname)) return null;
+    const parts = url.pathname.split("/").filter(Boolean);
+    const fileIndex = parts.findIndex((part) => part.endsWith(".gif"));
+    return fileIndex > 0 ? parts[fileIndex - 1] : null;
+  } catch (e) {
+    return null;
+  }
+};
+
 const normalizeGiphyImageUrl = (imageUrl) => {
   const url = new URL(imageUrl);
   if (isGiphyHost(url.hostname) && url.pathname.endsWith(".gif")) {
@@ -182,15 +246,11 @@ const writeRandomGiphy = async (outputPath) => {
 
     const giphyRes = await fetch(url.toString());
     const json = await giphyRes.json();
-    const imageUrl =
-      json.data?.images?.fixed_width?.url ||
-      json.data?.images?.downsized?.url ||
-      json.data?.images?.original?.url;
-    if (!giphyRes.ok || !imageUrl) {
+    if (!giphyRes.ok || !json.data?.images) {
       throw new PublicApiError(422, "Could not find a random GIF. Try again.");
     }
 
-    await writeRemoteGiphy(imageUrl, outputPath);
+    await writeFirstWorkingGiphy(getGiphyImageCandidates(json.data), outputPath);
   } catch (e) {
     if (e.statusCode) {
       throw e;
@@ -200,7 +260,10 @@ const writeRandomGiphy = async (outputPath) => {
 };
 
 const writeSquareGif = async (buffer, outputPath) => {
-  await sharp(buffer, { animated: true, pages: MAX_GIF_FRAMES })
+  const metadata = await sharp(buffer, { animated: true }).metadata();
+  const pages = Math.min(metadata.pages || 1, MAX_GIF_FRAMES);
+
+  await sharp(buffer, { animated: true, pages })
     .resize(512, 512, { fit: "cover" })
     .gif()
     .toFile(outputPath);
