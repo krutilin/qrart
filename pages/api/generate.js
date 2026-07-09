@@ -8,7 +8,7 @@ const sharp = require("sharp");
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 const GIPHY_BY_ID_URL = "https://api.giphy.com/v1/gifs/";
 const GIPHY_RANDOM_URL = "https://api.giphy.com/v1/gifs/random";
-const MAX_GIF_FRAMES = 36;
+const MAX_GIF_FRAMES = 60;
 const GIF_FETCH_TIMEOUT_MS = 8000;
 
 const images = [

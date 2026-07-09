@@ -20,17 +20,16 @@ const texts = {
     button: "Make QR",
     button_gif: "Make QR GIF",
     qr: "Your animated QR",
-    h3_topic_idea: "Idea",
-    p_topic_idea: "",
-    h3_topic_share: "Share",
     h3_topic_email: "Questions?",
     p_topic_telegram: "Message me on Telegram ",
     h3_topic_library: "Can I use it as a library?",
     p_topic_library_start: "Yes. The generator is powered by ",
     p_topic_library_end: ".",
+    h3_topic_source: "Can I see the source code?",
+    p_topic_source_start: "Yes. The app is open source: ",
+    p_topic_source_end: ". You can look around, fork it, or send a pull request.",
     h3_topic_giphy: "Where do GIFs come from?",
     p_topic_giphy: "GIF search and random GIFs are powered by GIPHY.",
-    select_image: "Select image",
     loading: "Loading ...",
     loading_phrases: [
       "Brewing pixels...",
@@ -73,17 +72,16 @@ const texts = {
     button: "Сделать QR",
     button_gif: "Сделать QR-гифку",
     qr: "Твоя QR-гифка",
-    h3_topic_idea: "Идея",
-    p_topic_idea: "Идея",
-    h3_topic_share: "Расшарь в сеточки",
     h3_topic_email: "Есть вопросы?",
     p_topic_telegram: "Пиши в тележку ",
     h3_topic_library: "Можно использовать как библиотеку?",
     p_topic_library_start: "Да. Генератор основан на ",
     p_topic_library_end: ".",
+    h3_topic_source: "Можно глянуть исходники?",
+    p_topic_source_start: "Да. Код открыт: ",
+    p_topic_source_end: ". Можно посмотреть, форкнуть или прислать pull request.",
     h3_topic_giphy: "Откуда берутся GIF?",
     p_topic_giphy: "Поиск GIF и рандомные GIF работают на GIPHY.",
-    select_image: "Выбрать картинку",
     loading: "Загрузка ...",
     loading_phrases: [
       "Варю пиво...",
@@ -274,7 +272,6 @@ export default function Home({ texts, galleryItems }) {
 
   useEffect(() => {
     if (!loading) {
-      setLoadingPhraseIndex(0);
       return undefined;
     }
 
@@ -292,6 +289,7 @@ export default function Home({ texts, galleryItems }) {
     if (!data) {
       data = "https://qrart.app/";
     }
+    setLoadingPhraseIndex(0);
     setLoading(true);
     setGenerateError(null);
     const imageIndex = imgSource === "template" ? templateIndex : null;
@@ -470,6 +468,22 @@ export default function Home({ texts, galleryItems }) {
                 qrart-lib
               </a>
               {texts.p_topic_library_end}
+            </p>
+
+            <h3 id="source">
+              <a href="#source">#</a>
+              {texts.h3_topic_source}
+            </h3>
+            <p>
+              {texts.p_topic_source_start}
+              <a
+                href="https://github.com/krutilin/qrart"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                GitHub
+              </a>
+              {texts.p_topic_source_end}
             </p>
 
             <h3 id="giphy">

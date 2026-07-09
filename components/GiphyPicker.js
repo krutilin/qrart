@@ -77,7 +77,8 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
   }, [giphy, onGifChange, texts.giphy_missing_key]);
 
   useEffect(() => {
-    search(defaultQuery);
+    const timer = setTimeout(() => search(defaultQuery), 0);
+    return () => clearTimeout(timer);
   }, [search]);
 
   const selectGif = useCallback(
