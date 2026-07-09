@@ -1,6 +1,25 @@
 {
   "name": "qrart",
+  "version": "0.1.0",
   "private": true,
+  "description": "Animated QR art generator built with Next.js and qrart-lib",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krutilin/qrart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/krutilin/qrart/issues"
+  },
+  "homepage": "https://qrart.app/",
+  "keywords": [
+    "qr",
+    "qrcode",
+    "qr-code",
+    "qr-art",
+    "animated-qr",
+    "gif"
+  ],
   "engines": {
     "node": "24.x"
   },
@@ -15,7 +34,7 @@
     "animate.css": "4.1.1",
     "nes.css": "2.3.0",
     "next": "12.0.3",
-    "node-fetch": "3.1.0",
+    "node-fetch": "^3.3.2",
     "qrart-lib": "^1.0.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
