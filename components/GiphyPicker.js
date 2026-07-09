@@ -35,7 +35,7 @@ const GiphyPicker = ({ apiKey, texts, onGifChange }) => {
         id: gif.id,
         title: gif.title,
         previewUrl: gif.images?.fixed_width_small?.url || gif.images?.downsized?.url,
-        url: gif.images?.original?.url,
+        url: gif.images?.fixed_width?.url || gif.images?.downsized?.url || gif.images?.original?.url,
       })).filter((gif) => gif.previewUrl && gif.url);
       setGifs(nextGifs);
       if (nextGifs[0]) {

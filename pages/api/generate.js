@@ -7,6 +7,7 @@ const sharp = require("sharp");
 
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 const GIPHY_RANDOM_URL = "https://api.giphy.com/v1/gifs/random";
+const MAX_GIF_FRAMES = 18;
 
 const images = [
   "cat",
@@ -26,6 +27,7 @@ const images = [
 const QR_VERSION = 10;
 
 export const config = {
+  maxDuration: 30,
   api: {
     bodyParser: {
       sizeLimit: "25mb",
@@ -153,7 +155,10 @@ const writeRandomGiphy = async (outputPath) => {
 
     const giphyRes = await fetch(url.toString());
     const json = await giphyRes.json();
-    const imageUrl = json.data?.images?.original?.url;
+    const imageUrl =
+      json.data?.images?.fixed_width?.url ||
+      json.data?.images?.downsized?.url ||
+      json.data?.images?.original?.url;
     if (!giphyRes.ok || !imageUrl) {
       return false;
     }
@@ -167,5 +172,8 @@ const writeRandomGiphy = async (outputPath) => {
 };
 
 const writeSquareGif = async (buffer, outputPath) => {
-  await sharp(buffer, { animated: true }).resize(512, 512, { fit: "cover" }).gif().toFile(outputPath);
+  await sharp(buffer, { animated: true, pages: MAX_GIF_FRAMES })
+    .resize(512, 512, { fit: "cover" })
+    .gif()
+    .toFile(outputPath);
 };
