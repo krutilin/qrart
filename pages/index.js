@@ -116,6 +116,77 @@ const texts = {
   },
 };
 
+const translitMap = {
+  а: "a",
+  б: "b",
+  в: "v",
+  г: "g",
+  д: "d",
+  е: "e",
+  ё: "e",
+  ж: "zh",
+  з: "z",
+  и: "i",
+  й: "y",
+  к: "k",
+  л: "l",
+  м: "m",
+  н: "n",
+  о: "o",
+  п: "p",
+  р: "r",
+  с: "s",
+  т: "t",
+  у: "u",
+  ф: "f",
+  х: "h",
+  ц: "ts",
+  ч: "ch",
+  ш: "sh",
+  щ: "sch",
+  ъ: "",
+  ы: "y",
+  ь: "",
+  э: "e",
+  ю: "yu",
+  я: "ya",
+};
+
+const getDownloadSource = (data) => {
+  const value = data.trim();
+  try {
+    const url = new URL(value);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      const path = decodeURIComponent(url.pathname).replace(/^\/|\/$/g, "");
+      return `${url.hostname} ${path}`;
+    }
+  } catch (e) {
+    return value;
+  }
+
+  return value;
+};
+
+const slugifyDownloadName = (data) => {
+  const source = getDownloadSource(data);
+  const slug = source
+    .toLowerCase()
+    .split("")
+    .map((letter) => translitMap[letter] ?? letter)
+    .join("")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64)
+    .replace(/-+$/g, "");
+
+  return slug || "qrcode";
+};
+
+const getDownloadName = (data, contentType) => {
+  const extension = contentType.includes("gif") ? "gif" : "jpg";
+  return `${slugifyDownloadName(data)}.${extension}`;
+};
+
 export async function getServerSideProps(context) {
   const { locale } = context;
 
@@ -264,7 +335,7 @@ export default function Home({ texts, galleryItems }) {
       }
       return nextUrl;
     });
-    setDownloadName(contentType.includes("gif") ? "qrcode.gif" : "qrcode.jpg");
+    setDownloadName(getDownloadName(data, contentType));
 
     setTimeout(() => {
       if (code.current) {
