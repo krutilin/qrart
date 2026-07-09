@@ -16,6 +16,7 @@ const texts = {
     p: "Turn any link into a moving QR code with GIF energy.",
     h3_title: "Make it move",
     h4: "Paste URL or text",
+    input_placeholder: "https://example.com or text",
     button: "Make QR",
     button_gif: "Make QR GIF",
     qr: "Your animated QR",
@@ -53,7 +54,9 @@ const texts = {
     giphy_search: "Find GIFs",
     giphy_search_placeholder: "GIF topic, e.g. cats, party, skate",
     giphy_missing_key: "Set NEXT_PUBLIC_GIPHY_API_KEY in .env to search GIFs",
+    giphy_no_results: "No GIFs found. Try another search.",
     generation_error: "Could not generate this QR. Try another GIF.",
+    upload_error: "Upload one GIF, JPG, or PNG up to 20 MB.",
     giphy_selected: "Selected animated GIF",
     template_selected: "Selected template",
     zone_drop: "Drag 'n' drop some files here, or click to select files",
@@ -66,6 +69,7 @@ const texts = {
     p: "Преврати любую ссылку в живой QR-код на GIF-фоне.",
     h3_title: "Сделай QR живым",
     h4: "Вставь URL или текст",
+    input_placeholder: "https://example.com или текст",
     button: "Сделать QR",
     button_gif: "Сделать QR-гифку",
     qr: "Твоя QR-гифка",
@@ -103,7 +107,9 @@ const texts = {
     giphy_search: "Найти GIF",
     giphy_search_placeholder: "Тема GIF: коты, party, skate",
     giphy_missing_key: "Добавь NEXT_PUBLIC_GIPHY_API_KEY в .env для поиска GIF",
+    giphy_no_results: "GIF не найдены. Попробуй другой запрос.",
     generation_error: "Не получилось сгенерировать QR. Попробуй другую гифку.",
+    upload_error: "Загрузи один GIF, JPG или PNG до 20 МБ.",
     giphy_selected: "Выбранная анимированная GIF",
     template_selected: "Выбранный шаблон",
     zone_drop: "Дропни картинку или выбери из файлов",
@@ -180,10 +186,10 @@ export default function Home({ texts, galleryItems }) {
   const onCheckRadio = useCallback(
     (e) => {
       setImgSource((previousSource) => {
-        if (previousSource !== e.target.name) {
+        if (previousSource !== e.target.value) {
           clearGeneratedQr();
         }
-        return e.target.name;
+        return e.target.value;
       });
     },
     [clearGeneratedQr]
@@ -219,19 +225,26 @@ export default function Home({ texts, galleryItems }) {
     setGenerateError(null);
     const imageIndex = imgSource === "template" ? templateIndex : null;
 
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data,
-        index: imageIndex,
-        file: imgSource === "upload" ? file : null,
-        giphyId: imgSource === "giphy" ? giphy?.id : null,
-        giphyUrls: imgSource === "giphy" ? giphy?.urls : null,
-      }),
-    });
+    let res;
+    try {
+      res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          data,
+          index: imageIndex,
+          file: imgSource === "upload" ? file : null,
+          giphyId: imgSource === "giphy" ? giphy?.id : null,
+          giphyUrls: imgSource === "giphy" ? giphy?.urls : null,
+        }),
+      });
+    } catch (e) {
+      setLoading(false);
+      setGenerateError(texts.generation_error);
+      return;
+    }
 
     if (!res.ok) {
       const json = await res.json().catch(() => null);
@@ -283,9 +296,16 @@ export default function Home({ texts, galleryItems }) {
           <section className="hero-panel section">
             <h3 className="title">{texts.h3_title}</h3>
             <h4>{texts.h4}</h4>
-            <input ref={input} type="text" className="nes-input" />
+            <input
+              ref={input}
+              type="text"
+              className="nes-input"
+              placeholder={texts.input_placeholder}
+              aria-label={texts.h4}
+            />
             <RadioGroup
               items={radioButtons}
+              groupName="image-source"
               checkedItem={imgSource}
               onChange={onCheckRadio}
             />
@@ -297,7 +317,11 @@ export default function Home({ texts, galleryItems }) {
               />
             )}
             {imgSource === "upload" && (
-              <Dropzone message={texts.zone_drop} onFileChange={setFile} />
+              <Dropzone
+                message={texts.zone_drop}
+                errorMessage={texts.upload_error}
+                onFileChange={setFile}
+              />
             )}
             {imgSource === "giphy" && (
               <GiphyPicker
