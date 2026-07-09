@@ -2,6 +2,12 @@
 
 QR to art processing app
 
+Local QR generation without Spaces credentials:
+
+```sh
+QRART_LOCAL_OUTPUT_DIR=public npm run dev
+```
+
 MVP TODO
 * twitter, instagram, fb
 * FAQ

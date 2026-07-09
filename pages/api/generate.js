@@ -1,8 +1,11 @@
 import fetch from "node-fetch";
+const fs = require("node:fs/promises");
+const os = require("node:os");
+const path = require("node:path");
 const aws = require("aws-sdk");
 const { nanoid } = require("nanoid");
+const { run } = require("qrart-lib");
 const sharp = require("sharp");
-const { Buffer } = require("buffer");
 
 const cdn_url = "https://qrart.fra1.cdn.digitaloceanspaces.com/templates/";
 
@@ -24,6 +27,8 @@ const images = [
 const fileExtension = "jpeg";
 const ENDPOINT = "fra1.digitaloceanspaces.com";
 const BUCKET = "qrart";
+const LOCAL_OUTPUT_DIR = process.env.QRART_LOCAL_OUTPUT_DIR;
+const QR_VERSION = 10;
 
 const spacesEndpoint = new aws.Endpoint(ENDPOINT);
 const s3 = new aws.S3({
@@ -37,8 +42,10 @@ const s3 = new aws.S3({
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(500).json({ error: "Method not allowed" });
+    return res.status(405).json({ error: "Method not allowed" });
   }
+
+  let tempDir = null;
 
   try {
     const { data, index, file } = req.body;
@@ -47,60 +54,68 @@ export default async function handler(req, res) {
       index != null ? index : Math.floor(Math.random() * images.length);
     const rndImageUrl = `${cdn_url}${images[rndImageIndex]}.png`;
 
-    let sourceImage = null;
+    tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "qrart-site-"));
+    const sourceImagePath = path.join(tempDir, "source.png");
 
     if (file) {
-      sourceImage = file;
+      await writeDataUrl(file, sourceImagePath);
     } else {
       const imgRes = await fetch(rndImageUrl);
-      const buf = await imgRes.buffer();
-      sourceImage = `data:image/png;base64,${buf.toString("base64")}`;
+      const buf = Buffer.from(await imgRes.arrayBuffer());
+      await fs.writeFile(sourceImagePath, buf);
     }
 
-    const lambda = new aws.Lambda({
-      credentials: {
-        accessKeyId: process.env.LAMBDA_ACCESS_KEY_ID,
-        secretAccessKey: process.env.LAMBDA_SECRET_ACCESS_KEY,
-      },
-      region: "us-east-1",
+    const { qrName } = await run(data, {
+      version: QR_VERSION,
+      picture: sourceImagePath,
+      colorized: true,
+      saveDir: tempDir,
+      saveName: "qrcode.png",
     });
 
-    const lambdaParams = {
-      FunctionName: "amzqr4lambda",
-      Payload: JSON.stringify({ word: data, image: sourceImage }),
-    };
-
-    const { Payload } = await lambda.invoke(lambdaParams).promise();
-    const { body } = JSON.parse(Payload);
-
-    if (body == null) {
-      return res.status(500).json({ error: "Internal server error" });
-    }
-
-    const buffer = Buffer.from(
-      body.replace("data:image/gif;base64,", ""),
-      "base64"
-    );
-
-    const qr = await sharp(buffer)
+    const qr = await sharp(qrName)
       .toFormat("jpeg", { mozjpeg: true })
       .toBuffer();
 
     const key = `res/${nanoid(10)}/qrcode.${fileExtension}`;
 
-    const params = {
-      Body: qr,
-      Bucket: BUCKET,
-      Key: key,
-      ACL: "public-read",
-    };
-
-    await s3.putObject(params).promise();
-    const url = `https://${BUCKET}.${ENDPOINT}/${key}`;
+    const url = await publishQr(key, qr);
 
     res.status(200).json({ url });
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: "Internal server error!" });
+  } finally {
+    if (tempDir) {
+      await fs.rm(tempDir, { force: true, recursive: true });
+    }
   }
 }
+
+const writeDataUrl = async (dataUrl, outputPath) => {
+  const [, base64] = dataUrl.match(/^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/) ?? [];
+  if (!base64) {
+    throw new Error("Invalid image payload");
+  }
+  await fs.writeFile(outputPath, Buffer.from(base64, "base64"));
+};
+
+const publishQr = async (key, qr) => {
+  if (LOCAL_OUTPUT_DIR) {
+    const outputPath = path.join(process.cwd(), LOCAL_OUTPUT_DIR, key);
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+    await fs.writeFile(outputPath, qr);
+    return `/${key}`;
+  }
+
+  await s3
+    .putObject({
+      Body: qr,
+      Bucket: BUCKET,
+      Key: key,
+      ACL: "public-read",
+    })
+    .promise();
+
+  return `https://${BUCKET}.${ENDPOINT}/${key}`;
+};
