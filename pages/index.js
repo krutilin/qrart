@@ -54,7 +54,11 @@ const texts = {
     giphy_search_placeholder: "GIF topic, e.g. cats, party, skate",
     giphy_missing_key: "Set NEXT_PUBLIC_GIPHY_API_KEY in .env to search GIFs",
     giphy_no_results: "No GIFs found. Try another search.",
-    generation_error: "Could not generate this QR. Try another GIF.",
+    generation_network_error: "Could not reach the generator. Check your connection and try again.",
+    generation_api_error: "The generator returned an error. Try another GIF.",
+    generation_response_error: "The generator returned an unexpected response instead of an image.",
+    generation_empty_error: "The generator returned an empty image. Try another GIF.",
+    generation_file_error: "The QR was generated, but the browser could not open the GIF.",
     upload_error: "Upload one GIF, JPG, or PNG up to 20 MB.",
     giphy_selected: "Selected animated GIF",
     template_selected: "Selected template",
@@ -106,7 +110,11 @@ const texts = {
     giphy_search_placeholder: "Тема GIF: коты, party, skate",
     giphy_missing_key: "Добавь NEXT_PUBLIC_GIPHY_API_KEY в .env для поиска GIF",
     giphy_no_results: "GIF не найдены. Попробуй другой запрос.",
-    generation_error: "Не получилось сгенерировать QR. Попробуй другую гифку.",
+    generation_network_error: "Не удалось достучаться до генератора. Проверь связь и попробуй еще раз.",
+    generation_api_error: "Генератор вернул ошибку. Попробуй другую гифку.",
+    generation_response_error: "Генератор вернул неожиданный ответ вместо картинки.",
+    generation_empty_error: "Генератор вернул пустую картинку. Попробуй другую гифку.",
+    generation_file_error: "QR сгенерировался, но браузер не смог открыть GIF.",
     upload_error: "Загрузи один GIF, JPG или PNG до 20 МБ.",
     giphy_selected: "Выбранная анимированная GIF",
     template_selected: "Выбранный шаблон",
@@ -311,20 +319,46 @@ export default function Home({ texts, galleryItems }) {
       });
     } catch (e) {
       setLoading(false);
-      setGenerateError(texts.generation_error);
+      setGenerateError(texts.generation_network_error);
       return;
     }
 
     if (!res.ok) {
       const json = await res.json().catch(() => null);
       setLoading(false);
-      setGenerateError(json?.error || texts.generation_error);
+      setGenerateError(json?.error || texts.generation_api_error);
       return;
     }
 
     const contentType = res.headers.get("content-type") || "";
-    const blob = await res.blob();
-    const nextUrl = URL.createObjectURL(blob);
+    if (!contentType.startsWith("image/")) {
+      setLoading(false);
+      setGenerateError(texts.generation_response_error);
+      return;
+    }
+
+    let blob;
+    try {
+      blob = await res.blob();
+    } catch (e) {
+      setLoading(false);
+      setGenerateError(texts.generation_file_error);
+      return;
+    }
+    if (!blob.size) {
+      setLoading(false);
+      setGenerateError(texts.generation_empty_error);
+      return;
+    }
+
+    let nextUrl;
+    try {
+      nextUrl = URL.createObjectURL(blob);
+    } catch (e) {
+      setLoading(false);
+      setGenerateError(texts.generation_file_error);
+      return;
+    }
     setLoading(false);
     input.current.value = data;
     setUrl((previousUrl) => {
@@ -340,7 +374,18 @@ export default function Home({ texts, galleryItems }) {
         code.current.scrollIntoView({ behavior: "smooth", block: "end" });
       }
     }, 100);
-  }, [input, file, giphy, imgSource, templateIndex, texts.generation_error]);
+  }, [
+    input,
+    file,
+    giphy,
+    imgSource,
+    templateIndex,
+    texts.generation_api_error,
+    texts.generation_empty_error,
+    texts.generation_file_error,
+    texts.generation_network_error,
+    texts.generation_response_error,
+  ]);
 
   useEffect(() => () => {
     if (url) {
